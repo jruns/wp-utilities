@@ -28,7 +28,7 @@ if ( ! defined( 'WPINC' ) ) {
 	die;
 }
 
-define( 'WP_UTILITIES_VERSION', '0.0.1' );
+define( 'WP_UTILITIES_VERSION', '1.0.0' );
 
 /**
  * The code that runs during plugin activation.
