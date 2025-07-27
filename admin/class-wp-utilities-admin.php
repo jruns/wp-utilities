@@ -51,7 +51,6 @@ class Wp_Utilities_Admin {
 
 		$this->plugin_name = $plugin_name;
 		$this->version = $version;
-
 	}
 
 	/**
@@ -98,6 +97,25 @@ class Wp_Utilities_Admin {
 
 		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/wp-utilities-admin.js', array( 'jquery' ), $this->version, false );
 
+	}
+
+	public function add_options_page() {
+		add_options_page(
+			'WP Performance Utilities',
+			'WP Performance Utilities',
+			'manage_options',
+			'wp-utilities',
+			array( $this, 'render_options_page' )
+		);
+	}
+
+	
+    public function registersettings() {
+        register_setting( 'wp-utilities', 'wp_utilities_disable_jquery_migrate');
+    }
+
+	public function render_options_page() {
+		require_once( plugin_dir_path( __FILE__ ) . 'partials/wp-utilities-admin-options-display.php' );
 	}
 
 }
