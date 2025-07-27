@@ -78,7 +78,7 @@ class Wp_Utilities {
 		$this->set_locale();
 		$this->define_admin_hooks();
 		$this->define_public_hooks();
-
+		$this->load_utilities();
 	}
 
 	/**
@@ -157,6 +157,9 @@ class Wp_Utilities {
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_styles' );
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
 
+		$this->loader->add_action( 'admin_init', $plugin_admin, 'registersettings' );
+		$this->loader->add_action( 'admin_menu', $plugin_admin, 'add_options_page' );
+
 	}
 
 	/**
@@ -173,6 +176,49 @@ class Wp_Utilities {
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_styles' );
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );
 
+	}
+
+	private function utility_is_active( $className ) {
+		$constant_name = strtoupper( $className );
+		$option_name = strtolower( $className );
+
+		if( defined( $constant_name ) ) {
+			if ( constant( $constant_name ) ) {
+				return true;
+			}
+		} else if ( $option_value = get_option( $option_name ) ) {
+			return true;
+		}
+
+		return false;
+	}
+
+	
+	/**
+	 * Load enabled utilities
+	 */
+	private function load_utilities() {
+		$utilities_dir = dirname( __FILE__ ) . '/utilities/';
+
+		if ( is_dir( $utilities_dir ) ) {
+			if ( $dh = opendir( $utilities_dir ) ) {
+				while ( ( $file = readdir( $dh ) ) !== false ) {
+					if ( $file == '.' || $file == '..' ) {
+						continue;
+					}
+
+					$className = str_replace( array( 'class-', '-', '.php'), array( '', ' ', ''), $file );
+					$className = str_replace( ' ', '_', ucwords( $className ) );
+
+					if ( $this->utility_is_active( $className ) ) {
+						include_once( $utilities_dir . $file );
+						$utility = new $className;
+						$utility->run();
+					}
+				}
+				closedir( $dh );
+			}
+		}
 	}
 
 	/**
