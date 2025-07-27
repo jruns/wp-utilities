@@ -6,6 +6,7 @@ class Wp_Utilities_Disable_Jquery_Migrate {
 	}
 
 	public function remove_jquery_migrate( $scripts ) {
+		// Remove jquery-migrate.min.js script from frontend
 		if ( ! is_admin() && isset( $scripts->registered[ 'jquery' ] ) ) {
 			$script = $scripts->registered[ 'jquery' ];
 
