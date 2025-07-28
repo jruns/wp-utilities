@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Fired during plugin deactivation
+ * Stores HTML output in a buffer
  *
  * @link       https://jruns.github.io/
  * @since      0.1.0
@@ -11,9 +11,9 @@
  */
 
 /**
- * Fired during plugin deactivation.
+ * Stores HTML output in a buffer
  *
- * This class defines all code necessary to run during the plugin's deactivation.
+ * This class defines all code necessary to store the frontend HTML output in a buffer for modification.
  *
  * @since      0.1.0
  * @package    Wp_Utilities
