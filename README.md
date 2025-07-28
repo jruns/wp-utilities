@@ -1,5 +1,5 @@
 # wp-utilities
-WP Performance Utilities plugin to improve the performance of a WordPress website.
+WP Performance Utilities is a WordPress plugin to improve the performance of a WordPress website.
 
 ## Available Utilities
 
