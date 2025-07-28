@@ -227,7 +227,7 @@ class Wp_Utilities {
 						}
 
 						// Activate on init so we can access filters
-						add_action( 'init', function() use ( $utilities_dir, $file, $className ) {
+						add_action( 'after_setup_theme', function() use ( $utilities_dir, $file, $className ) {
 							$utility = new $className;
 							$utility->run();
 						} );
