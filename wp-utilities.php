@@ -7,14 +7,14 @@
  * that starts the plugin.
  *
  * @link              https://jruns.github.io/
- * @since             1.0.0
+ * @since             0.1.0
  * @package           Wp_Utilities
  *
  * @wordpress-plugin
  * Plugin Name:       WP Performance Utilities 
  * Plugin URI:        https://github.com/jruns/wp-utilities
  * Description:       Utilities to improve the performance of your WordPress site.
- * Version:           1.0.0
+ * Version:           0.1.0
  * Author:            Jason Schramm
  * Author URI:        https://jruns.github.io//
  * License:           GPL-2.0+
@@ -28,7 +28,7 @@ if ( ! defined( 'WPINC' ) ) {
 	die;
 }
 
-define( 'WP_UTILITIES_VERSION', '1.0.0' );
+define( 'WP_UTILITIES_VERSION', '0.1.0' );
 
 /**
  * The code that runs during plugin activation.
@@ -64,7 +64,7 @@ require plugin_dir_path( __FILE__ ) . 'includes/class-wp-utilities.php';
  * then kicking off the plugin from this point in the file does
  * not affect the page life cycle.
  *
- * @since    1.0.0
+ * @since    0.1.0
  */
 function run_wp_utilities() {
 

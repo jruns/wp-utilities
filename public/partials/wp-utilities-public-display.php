@@ -6,7 +6,7 @@
  * This file is used to markup the public-facing aspects of the plugin.
  *
  * @link       https://jruns.github.io/
- * @since      1.0.0
+ * @since      0.1.0
  *
  * @package    Wp_Utilities
  * @subpackage Wp_Utilities/public/partials

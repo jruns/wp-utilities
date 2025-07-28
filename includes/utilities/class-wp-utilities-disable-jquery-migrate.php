@@ -19,7 +19,7 @@ class Wp_Utilities_Disable_Jquery_Migrate {
 	/**
 	 * Execute commands after initialization
 	 *
-	 * @since    1.0.0
+	 * @since    0.1.0
 	 */
 	public function run() {
 		add_action( 'wp_default_scripts', array( $this, 'remove_jquery_migrate' ) );
