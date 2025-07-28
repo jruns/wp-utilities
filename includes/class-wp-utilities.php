@@ -58,6 +58,15 @@ class Wp_Utilities {
 	protected $version;
 
 	/**
+	 * The status of the HTML buffer.
+	 *
+	 * @since    1.0.0
+	 * @access   protected
+	 * @var      bool    $buffer_is_active    The current status of the HTML buffer.
+	 */
+	protected $buffer_is_active;
+
+	/**
 	 * Define the core functionality of the plugin.
 	 *
 	 * Set the plugin name and the plugin version that can be used throughout the plugin.
@@ -175,7 +184,6 @@ class Wp_Utilities {
 
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_styles' );
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );
-
 	}
 
 	private function utility_is_active( $className ) {
@@ -212,12 +220,33 @@ class Wp_Utilities {
 
 					if ( $this->utility_is_active( $className ) ) {
 						include_once( $utilities_dir . $file );
-						$utility = new $className;
-						$utility->run();
+
+						// Activate output buffer if utility requires it and it has not been activated already
+						if( property_exists( $className, 'needs_html_buffer' ) && $className::$needs_html_buffer ) {
+							$this->activate_html_buffer();
+						}
+
+						// Activate on init so we can access filters
+						add_action( 'init', function() use ( $utilities_dir, $file, $className ) {
+							$utility = new $className;
+							$utility->run();
+						} );
 					}
 				}
 				closedir( $dh );
 			}
+		}
+	}
+
+	/**
+	 * Activate HTML Buffer if required by an active utility
+	 */
+	private function activate_html_buffer() {
+		if ( ! $this->buffer_is_active ) {
+			require_once plugin_dir_path( __FILE__ ) . 'class-wp-utilities-html-buffer.php';
+			new Wp_Utilities_Html_Buffer();
+
+			$this->buffer_is_active = true;
 		}
 	}
 
