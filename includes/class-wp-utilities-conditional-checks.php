@@ -15,6 +15,8 @@ class Wp_Utilities_Conditional_Checks {
 	}
 
 	public static function filter_matches( $matches ) {
+		global $wp;
+
 		$allowed_conditionals = array(
 			'is_home', 'is_front_page', 'is_single', 'is_page', 'is_author', 'is_archive', 'has_excerpt',
 			'is_search', 'is_404', 'is_paged', 'is_attachment', 'is_singular', 'is_user_logged_in',
@@ -22,7 +24,9 @@ class Wp_Utilities_Conditional_Checks {
 			'not_is_search', 'not_is_404', 'not_is_paged', 'not_is_attachment', 'not_is_singular', 'not_is_user_logged_in'
 		);
 
-		return array_filter( $matches, function( $value ) use( $allowed_conditionals ) {
+		$url_path = sanitize_title( str_replace( '/', '_', parse_url( $wp->request )['path'] ) );
+
+		return array_filter( $matches, function( $value ) use( $allowed_conditionals, $url_path ) {
 			if ( ! array_key_exists( 'match', $value ) ) {
 				return true;
 			}
@@ -31,7 +35,7 @@ class Wp_Utilities_Conditional_Checks {
 				$value['match'] = array( $value['match'] );
 			}
 
-			return array_reduce( $value['match'], function( $carry, $conditional ) use ( $allowed_conditionals ) {
+			return array_reduce( $value['match'], function( $carry, $conditional ) use ( $allowed_conditionals, $url_path ) {
 				$negate = false;
 				if ( 0 === strpos( $conditional, 'not_' ) ) {
 					// negate conditional
@@ -40,7 +44,8 @@ class Wp_Utilities_Conditional_Checks {
 				}
 
 				if ( 0 === strpos( $conditional, 'path_' ) ) {
-					return $carry;
+					$conditional = substr( $conditional, 5 );
+					return $negate ? ( $carry && ! substr( $url_path, 0, strlen( $conditional ) ) === $conditional ) : ( $carry && substr( $url_path, 0, strlen( $conditional ) ) === $conditional );
 				} elseif ( ! in_array( $conditional, $allowed_conditionals ) ) {
 					// Exclude unallowed conditional from matching
 					return $carry;

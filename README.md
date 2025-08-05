@@ -32,7 +32,7 @@ function remove_scripts_and_styles( $settings ) {
     );
     $settings['scripts'][] = array ( 
         'src'       => 'js/smooth_scroll.min.js',
-        'match'     => 'is_page'
+        'match'     => 'path_sample-page'
     );
     $settings['scripts'][] = array ( 
         'code'      => 'eztoc_smooth_local',
