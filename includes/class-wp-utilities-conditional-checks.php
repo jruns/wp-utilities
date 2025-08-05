@@ -11,12 +11,18 @@
  */
 
 class Wp_Utilities_Conditional_Checks {
-
 	public function __construct() {
 	}
 
 	public static function filter_matches( $matches ) {
-		return array_filter( $matches, function( $value ) {
+		$allowed_conditionals = array(
+			'is_home', 'is_front_page', 'is_single', 'is_page', 'is_author', 'is_archive', 'has_excerpt',
+			'is_search', 'is_404', 'is_paged', 'is_attachment', 'is_singular', 'is_user_logged_in',
+			'not_is_home', 'not_is_front_page', 'not_is_single', 'not_is_page', 'not_is_author', 'not_is_archive', 'not_has_excerpt',
+			'not_is_search', 'not_is_404', 'not_is_paged', 'not_is_attachment', 'not_is_singular', 'not_is_user_logged_in'
+		);
+
+		return array_filter( $matches, function( $value ) use( $allowed_conditionals ) {
 			if ( ! array_key_exists( 'match', $value ) ) {
 				return true;
 			}
@@ -24,13 +30,6 @@ class Wp_Utilities_Conditional_Checks {
 			if ( is_string( $value['match'] ) ) {
 				$value['match'] = array( $value['match'] );
 			}
-
-			$allowed_conditionals = array(
-				'is_home', 'is_front_page', 'is_single', 'is_page', 'is_author', 'is_archive', 'has_excerpt',
-				'is_search', 'is_404', 'is_paged', 'is_attachment', 'is_singular', 'is_user_logged_in',
-				'not_is_home', 'not_is_front_page', 'not_is_single', 'not_is_page', 'not_is_author', 'not_is_archive', 'not_has_excerpt',
-				'not_is_search', 'not_is_404', 'not_is_paged', 'not_is_attachment', 'not_is_singular', 'not_is_user_logged_in'
-			);
 
 			return array_reduce( $value['match'], function( $carry, $conditional ) use ( $allowed_conditionals ) {
 				$negate = false;
