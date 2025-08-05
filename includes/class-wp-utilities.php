@@ -84,9 +84,7 @@ class Wp_Utilities {
 		$this->plugin_name = 'wp-utilities';
 
 		$this->load_dependencies();
-		$this->set_locale();
 		$this->define_admin_hooks();
-		$this->define_public_hooks();
 		$this->load_utilities();
 	}
 
@@ -113,42 +111,18 @@ class Wp_Utilities {
 		 * core plugin.
 		 */
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-wp-utilities-loader.php';
-
+		
 		/**
-		 * The class responsible for defining internationalization functionality
-		 * of the plugin.
+		 * The class responsible for defining functions for page conditional processing.
 		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-wp-utilities-i18n.php';
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-wp-utilities-conditional-checks.php';
 
 		/**
 		 * The class responsible for defining all actions that occur in the admin area.
 		 */
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-wp-utilities-admin.php';
 
-		/**
-		 * The class responsible for defining all actions that occur in the public-facing
-		 * side of the site.
-		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/class-wp-utilities-public.php';
-
 		$this->loader = new Wp_Utilities_Loader();
-
-	}
-
-	/**
-	 * Define the locale for this plugin for internationalization.
-	 *
-	 * Uses the Wp_Utilities_i18n class in order to set the domain and to register the hook
-	 * with WordPress.
-	 *
-	 * @since    0.1.0
-	 * @access   private
-	 */
-	private function set_locale() {
-
-		$plugin_i18n = new Wp_Utilities_i18n();
-
-		$this->loader->add_action( 'plugins_loaded', $plugin_i18n, 'load_plugin_textdomain' );
 
 	}
 
@@ -163,27 +137,9 @@ class Wp_Utilities {
 
 		$plugin_admin = new Wp_Utilities_Admin( $this->get_plugin_name(), $this->get_version() );
 
-		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_styles' );
-		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
-
 		$this->loader->add_action( 'admin_init', $plugin_admin, 'registersettings' );
 		$this->loader->add_action( 'admin_menu', $plugin_admin, 'add_options_page' );
 
-	}
-
-	/**
-	 * Register all of the hooks related to the public-facing functionality
-	 * of the plugin.
-	 *
-	 * @since    0.1.0
-	 * @access   private
-	 */
-	private function define_public_hooks() {
-
-		$plugin_public = new Wp_Utilities_Public( $this->get_plugin_name(), $this->get_version() );
-
-		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_styles' );
-		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );
 	}
 
 	private function utility_is_active( $className ) {
@@ -201,7 +157,6 @@ class Wp_Utilities {
 		return false;
 	}
 
-	
 	/**
 	 * Load enabled utilities
 	 */

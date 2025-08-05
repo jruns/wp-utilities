@@ -17,7 +17,10 @@ class Wp_Utilities_Remove_Scripts_And_Styles {
 
 	public function process_removals( $buffer ) {
 		// Filter out removals that are not valid for the current page, based on conditional matches
+		$this->settings['scripts'] = Wp_Utilities_Conditional_Checks::filter_matches( $this->settings['scripts'] );
+		$this->settings['styles'] = Wp_Utilities_Conditional_Checks::filter_matches( $this->settings['styles'] );
 
+		// Process removals
 		if ( ! empty( $this->settings['scripts'] ) ) {
 			$match_ids = join( "|", array_column( $this->settings['scripts'], 'id' ) );
 			$match_sources = addcslashes( join( "|", array_column( $this->settings['scripts'], 'src' ) ), '/' );
