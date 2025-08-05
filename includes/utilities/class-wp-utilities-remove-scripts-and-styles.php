@@ -17,44 +17,10 @@ class Wp_Utilities_Remove_Scripts_And_Styles {
 
 	public function process_removals( $buffer ) {
 		// Filter out removals that are not valid for the current page, based on conditional matches
-		
-		$this->settings['scripts'] = array_filter( $this->settings['scripts'], function( $value ) {
-			if ( ! array_key_exists( 'match', $value ) ) {
-				return true;
-			}
+		$this->settings['scripts'] = Wp_Utilities_Conditional_Checks::filter_matches( $this->settings['scripts'] );
+		$this->settings['styles'] = Wp_Utilities_Conditional_Checks::filter_matches( $this->settings['styles'] );
 
-			if ( is_string( $value['match'] ) ) {
-				$value['match'] = array( $value['match'] );
-			}
-
-			$allowed_conditionals = array(
-				'is_home', 'is_front_page', 'is_single', 'is_page', 'is_author', 'is_archive', 'has_excerpt',
-				'is_search', 'is_404', 'is_paged', 'is_attachment', 'is_singular', 'is_user_logged_in',
-				'not_is_home', 'not_is_front_page', 'not_is_single', 'not_is_page', 'not_is_author', 'not_is_archive', 'not_has_excerpt',
-				'not_is_search', 'not_is_404', 'not_is_paged', 'not_is_attachment', 'not_is_singular', 'not_is_user_logged_in'
-			);
-
-			return array_reduce( $value['match'], function( $carry, $conditional ) use ( $allowed_conditionals ) {
-				$negate = false;
-				if ( 0 === strpos( $conditional, 'not_' ) ) {
-					// negate conditional
-					$conditional = substr( $conditional, 4 );
-					$negate = true;
-				}
-
-				if ( 0 === strpos( $conditional, 'path_' ) ) {
-					return $carry;
-				} elseif ( ! in_array( $conditional, $allowed_conditionals ) ) {
-					// Exclude unallowed conditional from matching
-					return $carry;
-				}
-
-				return $negate ? ( $carry && ! $conditional() ) : ( $carry && $conditional() );
-			}, true);
-
-			return true;
-		} );
-
+		// Process removals
 		if ( ! empty( $this->settings['scripts'] ) ) {
 			$match_ids = join( "|", array_column( $this->settings['scripts'], 'id' ) );
 			$match_sources = addcslashes( join( "|", array_column( $this->settings['scripts'], 'src' ) ), '/' );

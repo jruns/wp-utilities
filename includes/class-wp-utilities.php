@@ -111,6 +111,11 @@ class Wp_Utilities {
 		 * core plugin.
 		 */
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-wp-utilities-loader.php';
+		
+		/**
+		 * The class responsible for defining functions for page conditional processing.
+		 */
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-wp-utilities-conditional-checks.php';
 
 		/**
 		 * The class responsible for defining all actions that occur in the admin area.
