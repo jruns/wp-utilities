@@ -42,6 +42,25 @@ if( defined( $utility_constant ) ) {
 <?php _e( 'Disable jQuery migrate from the frontend.' ); ?></label>
 <?php echo $after_label_msg; ?></td>
 </tr>
+
+<tr valign="top">
+<th scope="row"><?php _e( 'Enable YouTube Facade?', 'wp-utilities' ); ?></th>
+<?php 
+$utility_var = 'wp_utilities_enable_youtube_facade';
+$utility_constant = strtoupper( $utility_var );
+$utility_status = null;
+$after_label_msg = '';
+if( defined( $utility_constant ) ) {
+    $utility_status = constant( $utility_constant );
+    $after_label_msg = __( "<br/><br/>This setting is currently configured in your wp-config.php file and can only be edited there. Remove $utility_constant from wp-config.php in order to configure this setting here." );
+} else {
+    $utility_status = get_option( 'wp_utilities_enable_youtube_facade' );
+}
+?>
+<td><label><input type="checkbox" id="wp_utilities_enable_youtube_facade" name="wp_utilities_enable_youtube_facade" value="1" <?php echo $utility_status ? 'checked="checked"' : ''; ?> <?php echo defined( $utility_constant ) ? 'disabled' : ''; ?>/>
+<?php _e( 'Enable YouTube facade for videos on the frontend, and delay loading videos until the user clicks the placeholder image.' ); ?></label>
+<?php echo $after_label_msg; ?></td>
+</tr>
 </table>
 
 </li>
