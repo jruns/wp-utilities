@@ -14,7 +14,7 @@
  * Plugin Name:       WP Performance Utilities 
  * Plugin URI:        https://github.com/jruns/wp-utilities
  * Description:       Utilities to improve the performance of your WordPress site.
- * Version:           0.1.0
+ * Version:           0.2.0
  * Author:            Jason Schramm
  * Author URI:        https://jruns.github.io/
  * License:           GPL-2.0+
@@ -28,7 +28,8 @@ if ( ! defined( 'WPINC' ) ) {
 	die;
 }
 
-define( 'WP_UTILITIES_VERSION', '0.1.0' );
+define( 'WP_UTILITIES_VERSION', '0.2.0' );
+define( 'WP_UTILITIES_BASE_NAME', plugin_basename( __FILE__ ) );
 
 /**
  * The code that runs during plugin activation.
