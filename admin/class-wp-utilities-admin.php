@@ -69,7 +69,7 @@ class Wp_Utilities_Admin {
 	}
 
 	public function add_plugin_action_links( array $links ) {
-		$settings_url = menu_page_url( 'wp-utilities' );
+		$settings_url = menu_page_url( 'wp-utilities', false );
 		return array_merge( array(
 			'settings' => '<a href="' . esc_url( $settings_url ) . '">' . esc_html__( 'Settings', 'wp-utilities' ) . '</a>',
 		), $links );
