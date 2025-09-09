@@ -49,7 +49,7 @@ class Wp_Utilities_Enable_Youtube_Facade {
 
 	public function get_footer_code() {
 		$footer_code = <<<END
-<style>
+<style id="wputil-youtube-facade-styles">
 .wputil-youtube-play { 
 	position: absolute;
 	left: 50%;
@@ -110,7 +110,7 @@ class Wp_Utilities_Enable_Youtube_Facade {
 }
 </style>
 
-<script>
+<script id="wputil-youtube-facade-scripts">
 document.addEventListener('DOMContentLoaded', function () {
     var youtubeFacades = document.querySelectorAll('.wputil-youtube-embed');
     youtubeFacades.forEach(function (facade) {
