@@ -33,7 +33,7 @@ class Wp_Utilities_Enable_Youtube_Facade {
 
 				$img_url = "https://img.youtube.com/vi/$video_id/hqdefault.jpg";
 
-				return "<div class='wputil-youtube-embed wputil-youtube-embed-$video_id' data-src='$video_url' data-background-image='$img_url' data-video-id='$video_id' data-width='$width' data-height='$height' style=\"position: relative;cursor: pointer;max-width: ${width}px;height: ${height}px;background-image:url('$img_url');background-size: cover;background-position: center;\" title='Play'><div class='wputil-youtube-play'></div></div><noscript>$original_iframe</noscript>";
+				return "<div class='wputil-youtube-embed wputil-youtube-embed-$video_id' data-src='$video_url' data-background-image='$img_url' data-video-id='$video_id' data-width='$width' data-height='$height' style=\"position: relative;cursor: pointer;max-width: ${width}px;height: ${height}px;background-image:url('$img_url');background-size: cover;background-position: center;\" title='Play'><div class='wputil-youtube-play'></div></div>";
 			},
 			$buffer,
 			-1,
