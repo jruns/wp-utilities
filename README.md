@@ -13,6 +13,16 @@ define( 'WP_UTILITIES_DISABLE_JQUERY_MIGRATE', true );
 
 Or activate the utility on the WP Performance Utilities wp-admin options page.
 
+### Enable YouTube Facade
+This utility will replace YouTube iframes with an image placeholder (facade) on any frontend posts or pages. This delays initializing the video until the user clicks on the placeholder image, at which time the video will load and autoplay. The image placeholder is lazy loaded by default. And if the user has javascript disabled, clicking on the image will open the video in a new tab.
+
+Add this to your wp-config.php file:
+```php
+define( 'WP_UTILITIES_ENABLE_YOUTUBE_FACADE', true );
+```
+
+Or activate the utility on the WP Performance Utilities wp-admin options page.
+
 ### Remove Scripts and Styles
 This utility will remove specified javascript scripts and css styles from the frontend. It does not remove them from the admin section.  
 

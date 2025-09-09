@@ -139,7 +139,7 @@ class Wp_Utilities {
 
 		$this->loader->add_action( 'admin_init', $plugin_admin, 'registersettings' );
 		$this->loader->add_action( 'admin_menu', $plugin_admin, 'add_options_page' );
-
+		$this->loader->add_action( 'plugin_action_links_' . WP_UTILITIES_BASE_NAME, $plugin_admin, 'add_plugin_action_links' );
 	}
 
 	private function utility_is_active( $className ) {
