@@ -35,7 +35,7 @@ class Wp_Utilities_Enable_Youtube_Facade {
 
 				return "<div class='wputil-youtube-embed wputil-youtube-embed-$video_id' style='width:${width}px'>
 				<a href='$nonembed_video_url' data-video-id='$video_id' data-width='$width' data-height='$height' style=\"\" title='Play' target='_blank'>
-					<img src='$img_url' width='$width' height='$height' style='height: ${height}px;object-fit: cover;aspect-ratio: $width / $height;' />
+					<img src='$img_url' loading='lazy' width='$width' height='$height' style='height: ${height}px;object-fit: cover;aspect-ratio: $width / $height;' />
 					<div class='wputil-youtube-play'></div>
 				</a></div>";
 			},
