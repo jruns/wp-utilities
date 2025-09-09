@@ -10,11 +10,14 @@ class Wp_Utilities_Enable_Youtube_Facade {
 	}
 
 	public function process_youtube_iframes( $buffer ) {
+		$youtube_iframe_count = 0;
+
 		// Process all YouTube iframe tags
 		$buffer = preg_replace_callback( 
 			'/<iframe[^>]*?src=[\\\'\"]([^\\\'\"]*youtube\.com[^\\\'\"]*)[\\\'\"][^>]*?>[\s\S]*?<\/[^>]*iframe[^>]*>/im', 
-			function( $matches )  {
+			function( $matches ) {
 				// Replace YouTube iframes with placeholder image (facade)
+				$has_youtube_iframes = true;
 
 				$original_iframe = $matches[0];
 
@@ -30,27 +33,22 @@ class Wp_Utilities_Enable_Youtube_Facade {
 
 				$img_url = "https://img.youtube.com/vi/$video_id/hqdefault.jpg";
 
-				return "<div class='wputil-youtube-embed wputil-youtube-embed-$video_id' data-src='$video_url' data-video-id='$video_id' data-width='$width' data-height='$height' style=\"position: relative;cursor: pointer;max-width: ${width}px;height: ${height}px;background-image:url('$img_url');background-size: cover;background-position: center;\" title='Play'><div class='wputil-youtube-play'></div></div><noscript>$original_iframe</noscript>";
+				return "<div class='wputil-youtube-embed wputil-youtube-embed-$video_id' data-src='$video_url' data-background-image='$img_url' data-video-id='$video_id' data-width='$width' data-height='$height' style=\"position: relative;cursor: pointer;max-width: ${width}px;height: ${height}px;background-image:url('$img_url');background-size: cover;background-position: center;\" title='Play'><div class='wputil-youtube-play'></div></div><noscript>$original_iframe</noscript>";
 			},
-			$buffer
+			$buffer,
+			-1,
+			$youtube_iframe_count
 		);
+
+		if( $youtube_iframe_count > 0 ) {
+			$buffer = str_replace( '</body>', $this->get_footer_code() . '</body>', $buffer );
+		}
 
 		return $buffer;
 	}
 
-	/**
-	 * Execute commands after initialization
-	 *
-	 * @since    0.1.0
-	 */
-	public function run() {
-		// Iterate over scripts and styles to remove
-		add_filter( 'wp_utilities_modify_final_output', array( $this, 'process_youtube_iframes' ), 15 );
-
-		add_action( 'wp_footer', function() {
-			echo '<script type="module" src="https://cdn.jsdelivr.net/npm/@justinribeiro/lite-youtube@1/lite-youtube.min.js"></script>';
-
-			echo <<<END
+	public function get_footer_code() {
+		$footer_code = <<<END
 <style>
 .wputil-youtube-play { 
 	position: absolute;
@@ -65,7 +63,6 @@ class Wp_Utilities_Enable_Youtube_Facade {
 	border-radius: 50% / 10%;
 	color: #FFFFFF;
 	text-align: center;
-	transition: all 150ms ease-out;
 }
 
 .wputil-youtube-play::before { 
@@ -116,7 +113,18 @@ document.addEventListener('DOMContentLoaded', function () {
 
 });
 </script>
+
 END;
-		});
+		return $footer_code;
+	}
+
+	/**
+	 * Execute commands after initialization
+	 *
+	 * @since    0.1.0
+	 */
+	public function run() {
+		// Iterate over scripts and styles to remove
+		add_filter( 'wp_utilities_modify_final_output', array( $this, 'process_youtube_iframes' ), 15 );
 	}
 }
