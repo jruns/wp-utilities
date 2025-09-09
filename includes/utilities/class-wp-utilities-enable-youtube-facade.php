@@ -140,6 +140,6 @@ END;
 	 */
 	public function run() {
 		// Iterate over scripts and styles to remove
-		add_filter( 'wp_utilities_modify_final_output', array( $this, 'process_youtube_iframes' ), 15 );
+		add_filter( 'wp_utilities_modify_final_output', array( $this, 'process_youtube_iframes' ), 9 );
 	}
 }
