@@ -20,12 +20,12 @@ class Wp_Utilities_Enable_Youtube_Facade {
 				$has_youtube_iframes = true;
 
 				$original_iframe = $matches[0];
-
-				$video_url = $matches[1];
-				$video_url .= strpos( $video_url, '?' ) === false ? '?autoplay=1' : '&autoplay=1';
+				$original_video_url = $matches[1];
 
 				preg_match( '/src=[\\\'\"][^\\\'\"]*youtube\.com\/embed\/([a-zA-Z0-9]+)[^\\\'\"]*[\\\'\"]/i', $matches[0], $video_id_matches );
 				$video_id = $video_id_matches[1];
+
+				$nonembed_video_url = "https://www.youtube.com/watch?v=${video_id}";
 
 				preg_match( '/width=[\\\'\"]([^\\\'\"]*)[\\\'\"] height=[\\\'\"]([^\\\'\"]*)[\\\'\"]/i', $matches[0], $dimension_matches );
 				$width = $dimension_matches[1];
@@ -33,7 +33,11 @@ class Wp_Utilities_Enable_Youtube_Facade {
 
 				$img_url = "https://img.youtube.com/vi/$video_id/hqdefault.jpg";
 
-				return "<div class='wputil-youtube-embed wputil-youtube-embed-$video_id' data-src='$video_url' data-background-image='$img_url' data-video-id='$video_id' data-width='$width' data-height='$height' style=\"position: relative;cursor: pointer;max-width: ${width}px;height: ${height}px;background-image:url('$img_url');background-size: cover;background-position: center;\" title='Play'><div class='wputil-youtube-play'></div></div>";
+				return "<div class='wputil-youtube-embed wputil-youtube-embed-$video_id' style='width:${width}px'>
+				<a href='$nonembed_video_url' data-video-id='$video_id' data-width='$width' data-height='$height' style=\"\" title='Play' target='_blank'>
+					<img src='$img_url' width='$width' height='$height' style='height: ${height}px;object-fit: cover;aspect-ratio: $width / $height;' />
+					<div class='wputil-youtube-play'></div>
+				</a></div>";
 			},
 			$buffer,
 			-1,
@@ -50,10 +54,18 @@ class Wp_Utilities_Enable_Youtube_Facade {
 	public function get_footer_code() {
 		$footer_code = <<<END
 <style id="wputil-youtube-facade-styles">
+.wputil-youtube-embed {
+	position: relative;
+}
+.wputil-youtube-embed a {
+	text-decoration: none;
+}
+
 .wputil-youtube-play { 
 	position: absolute;
 	left: 50%;
 	top: 50%;
+	content: '';
 	width: 62px;
 	height: 48px;
 	margin-left: -34px;
@@ -64,7 +76,6 @@ class Wp_Utilities_Enable_Youtube_Facade {
 	color: #FFFFFF;
 	text-align: center;
 }
-
 .wputil-youtube-play::before { 
 	background: inherit;
 	border-radius: 5% / 50%;
@@ -75,7 +86,6 @@ class Wp_Utilities_Enable_Youtube_Facade {
 	right: -5%;
 	top: 9%;
 }
-
 .wputil-youtube-play::after {
 	border-style: solid;
 	border-width: 1em 0 1em 1.732em;
@@ -88,41 +98,42 @@ class Wp_Utilities_Enable_Youtube_Facade {
 	position: absolute;
 	width: 0;
 }
+
 .wp-embed-responsive .wp-embed-aspect-16-9 .wp-block-embed__wrapper::before {
 	padding-top: 0;
 }
-.wp-embed-responsive .wp-embed-aspect-16-9 .wp-block-embed__wrapper .wputil-youtube-embed {
+.wp-embed-responsive .wp-embed-aspect-16-9 .wp-block-embed__wrapper .wputil-youtube-embed:has(iframe) {
   padding-top: 56.25%;
 }
-
 .wp-embed-responsive .wp-has-aspect-ratio .wputil-youtube-embed {
-  bottom: 0;
-  height: 100%;
-  left: 0;
-  position: absolute;
-  right: 0;
-  top: 0;
   width: 100% !important;
-  max-width: 100% !important;
 }
 .wp-block-embed .wputil-youtube-embed {
   max-width: 100%;
+}
+.wp-embed-responsive .wp-has-aspect-ratio .wputil-youtube-embed, .wp-embed-responsive .wp-has-aspect-ratio .wputil-youtube-embed a, .wp-embed-responsive .wp-has-aspect-ratio .wputil-youtube-embed img {
+  height: 100% !important;
+  width: 100% !important;
+  max-width: 100% !important;
 }
 </style>
 
 <script id="wputil-youtube-facade-scripts">
 document.addEventListener('DOMContentLoaded', function () {
-    var youtubeFacades = document.querySelectorAll('.wputil-youtube-embed');
+    var youtubeFacades = document.querySelectorAll('.wputil-youtube-embed a');
     youtubeFacades.forEach(function (facade) {
-        facade.addEventListener('click', function () {
+        facade.addEventListener('click', function (e) {
+			e.preventDefault();
+
             var iframe = document.createElement('iframe');
-            iframe.setAttribute('src', facade.dataset.src);
+            iframe.setAttribute('src', 'https://www.youtube.com/embed/' + facade.dataset.videoId + '?autoplay=1');
             iframe.setAttribute('allowfullscreen', 'true');
             iframe.setAttribute('frameborder', '0');
             iframe.setAttribute('width', facade.dataset.width ?? 560);
             iframe.setAttribute('height', facade.dataset.height ?? 315);
-            iframe.setAttribute('allow', 'accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; web-share');
-            facade.replaceChildren(iframe);
+            iframe.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share');
+			iframe.setAttribute('referrerpolicy', 'strict-origin-when-cross-origin');
+            facade.replaceWith(iframe);
             iframe.focus();
         });
     });
