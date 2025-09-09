@@ -88,6 +88,26 @@ class Wp_Utilities_Enable_Youtube_Facade {
 	position: absolute;
 	width: 0;
 }
+.wp-embed-responsive .wp-embed-aspect-16-9 .wp-block-embed__wrapper::before {
+	padding-top: 0;
+}
+.wp-embed-responsive .wp-embed-aspect-16-9 .wp-block-embed__wrapper .wputil-youtube-embed {
+  padding-top: 56.25%;
+}
+
+.wp-embed-responsive .wp-has-aspect-ratio .wputil-youtube-embed {
+  bottom: 0;
+  height: 100%;
+  left: 0;
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 100% !important;
+  max-width: 100% !important;
+}
+.wp-block-embed .wputil-youtube-embed {
+  max-width: 100%;
+}
 </style>
 
 <script>
@@ -106,11 +126,6 @@ document.addEventListener('DOMContentLoaded', function () {
             iframe.focus();
         });
     });
-
-    document.querySelectorAll('.wp-block-embed__wrapper').forEach(element => {
-        element.classList.add('custom-padding');
-    });
-
 });
 </script>
 
