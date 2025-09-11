@@ -13,6 +13,12 @@
  */
 ?>
 <style>
+    @media screen and (min-width: 783px) {
+        .form-table th {
+            width: 250px;
+        }
+    }
+
     .utility_notice {
         font-size: 0.9em;
         color: #666;
@@ -35,6 +41,13 @@ $args = array(
     'utility_var'       => 'wp_utilities_disable_jquery_migrate',
     'heading'           => 'Disable jQuery Migrate?',
     'description'       => 'Disable jQuery migrate script from the frontend.'
+);
+echo output_admin_option( $args );
+
+$args = array(
+    'utility_var'       => 'wp_utilities_move_scripts_and_styles_to_footer',
+    'heading'           => 'Move Scripts and Styles to the footer?',
+    'description'       => 'Enable the `wp_utilities_scripts_and_styles_to_move_to_footer` WordPress filter to selectively move scripts and styles to the page footer on the frontend.'
 );
 echo output_admin_option( $args );
 
