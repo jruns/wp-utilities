@@ -22,11 +22,19 @@ class Wp_Utilities_Remove_Scripts_And_Styles {
 
 		// Process removals
 		if ( ! empty( $this->settings['scripts'] ) ) {
-			$match_ids = join( "|", array_column( $this->settings['scripts'], 'id' ) );
+			$match_ids =                  join( "|", array_column( $this->settings['scripts'], 'id' ) );
 			$match_sources = addcslashes( join( "|", array_column( $this->settings['scripts'], 'src' ) ), '/' );
-			$match_code = addcslashes( join( "|", array_column( $this->settings['scripts'], 'code' ) ), '/' );
+			$match_code =    addcslashes( join( "|", array_column( $this->settings['scripts'], 'code' ) ), '/' );
 
 			// Process all script tags
+			$buffer_replacement_settings = array(
+				'tag_regex'		=> '/<script[^>]*>[\s\S]*?<\/[^>]*script[^>]*>/im',
+				'matches'		=> array(
+					'id' 	=> $match_ids,
+					'src' 	=> $match_sources,
+					'code'	=> $match_code
+				)
+			);
 			$buffer = preg_replace_callback( 
 				'/<script[^>]*>[\s\S]*?<\/[^>]*script[^>]*>/im', 
 				function( $matches ) use( $match_ids, $match_sources, $match_code )  {
@@ -58,6 +66,11 @@ class Wp_Utilities_Remove_Scripts_And_Styles {
 			$match_code = addcslashes( join( "|", array_column( $this->settings['styles'], 'code' ) ), '/' );
 
 			// Process all stylesheet link tags
+			$buffer_replacement_settings = array(
+				'tag_regex'		=> '/<link[^>]*rel=[\\\'\"]stylesheet[\\\'\"][^>]*>/i',
+				'id_matches' 	=> $match_ids,
+				'href_matches' 	=> $match_sources
+			);
 			$buffer = preg_replace_callback( 
 				'/<link[^>]*rel=[\\\'\"]stylesheet[\\\'\"][^>]*>/i', 
 				function( $matches ) use( $match_ids, $match_sources )  {
