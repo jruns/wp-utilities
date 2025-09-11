@@ -19,13 +19,13 @@ class Wp_Utilities_Html_Buffer {
 		add_action( 'shutdown', array( $this, 'end_buffer' ), 9 );
 	}
 
-	static function process_buffer( $buffer ) {
+	static function filter_buffer( $buffer ) {
 		$buffer = apply_filters( 'wp_utilities_modify_final_output', $buffer );
 		return $buffer;
 	}
 
 	public function start_buffer() {
-		ob_start( array( 'self', 'process_buffer' ) );
+		ob_start( array( 'self', 'filter_buffer' ) );
 	}
 
 	public function end_buffer() {
