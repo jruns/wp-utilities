@@ -66,13 +66,3 @@ function remove_scripts_and_styles( $settings ) {
 }
 add_filter( 'wp_utilities_scripts_and_styles_to_remove', 'remove_scripts_and_styles', 10, 1 );
 ```
-
-## To Do
-1. Add support for matching conditionals when modifying a script or style
-2. Simplify code that removes script or style tags when configured conditionals match. Use reusable functions for common commands.
-3. Remove script by handle, source code, or filename, and by conditional or page parameters (slug, root folder, child folder)
-4. Remove stylesheet by handle, inline code, or filename, and by conditional or page parameters (slug, root folder, child folder)
-5. Move script or stylesheet to footer by handle, inline code, or filename.
-6. Delay script by handle or filename, and by conditional or page parameters (slug, root folder, child folder)
-7. Delay stylesheet by handle or filename, and by conditional or page parameters (slug, root folder, child folder)
-8. Cleanup plugin code, restructure code, and remove unneeded code.
