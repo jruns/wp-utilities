@@ -108,6 +108,6 @@ class Wp_Utilities_Remove_Scripts_And_Styles {
 	 */
 	public function run() {
 		// Iterate over scripts and styles to remove
-		add_filter( 'wp_utilities_modify_final_output', array( $this, 'process_removals' ) );
+		add_filter( 'wp_utilities_modify_final_output', array( $this, 'process_removals' ), 15 );
 	}
 }
