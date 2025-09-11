@@ -20,96 +20,72 @@ class Wp_Utilities_Move_Scripts_And_Styles_To_Footer {
 		$this->settings['scripts'] = Wp_Utilities_Conditional_Checks::filter_matches( $this->settings['scripts'] );
 		$this->settings['styles'] = Wp_Utilities_Conditional_Checks::filter_matches( $this->settings['styles'] );
 
-		$moves_to_make = array();
-
 		// Process moves
 		if ( ! empty( $this->settings['scripts'] ) ) {
-			$match_ids = join( "|", array_column( $this->settings['scripts'], 'id' ) );
-			$match_sources = addcslashes( join( "|", array_column( $this->settings['scripts'], 'src' ) ), '/' );
-			$match_code = addcslashes( join( "|", array_column( $this->settings['scripts'], 'code' ) ), '/' );
-
 			// Process all script tags
-			$buffer = preg_replace_callback( 
-				'/<script[^>]*>[\s\S]*?<\/[^>]*script[^>]*>/im', 
-				function( $matches ) use( $match_ids, $match_sources, $match_code, $moves_to_make )  {
-
-					// Remove matching ids, store in temporary array to add to footer
-					if ( ! empty( $match_ids ) && preg_match( '/id=[\\\'\"][^\\\'\"]*(' . $match_ids . ')[^\\\'\"]*[\\\'\"]/i', $matches[0], $tag_match ) ) {
-						$moves_to_make[] = $tag_match[1];
-						return '';
-					}
-
-					// Remove matching src attributes
-					if ( ! empty( $match_sources ) && preg_match( '/src=[\\\'\"][^\\\'\"]*(' . $match_sources . ')[^\\\'\"]*[\\\'\"]/i', $matches[0], $tag_match ) ) {
-						$moves_to_make[] = $tag_match[1];
-						return '';
-					}
-
-					// Remove matching inline javascript code
-					if ( ! empty( $match_code ) && preg_match( '/(' . $match_code . ')/im', $matches[0], $tag_match ) ) {
-						$moves_to_make[] = $tag_match[1];
-						return '';
-					}
-					
-					return $matches[0];
-				},
-				$buffer
+			$match_args = array(
+				'tag_regex'			=> '/<script[^>]*>[\s\S]*?<\/[^>]*script[^>]*>\n?/im',
+				'match_settings'	=> $this->settings['scripts'],
+				'match_types'		=> array( 'id', 'src', 'code' )
 			);
+			$buffer = $this->process_buffer_moves( $buffer, $match_args );
 		}
 
 		if ( ! empty( $this->settings['styles'] ) ) {
-			$match_ids = join( "|", array_column( $this->settings['styles'], 'id' ) );
-			$match_sources = addcslashes( join( "|", array_column( $this->settings['styles'], 'href' ) ), '/' );
-			$match_code = addcslashes( join( "|", array_column( $this->settings['styles'], 'code' ) ), '/' );
-
-			// Process all stylesheet link tags
-			$buffer = preg_replace_callback( 
-				'/<link[^>]*rel=[\\\'\"]stylesheet[\\\'\"][^>]*>/i', 
-				function( $matches ) use( $match_ids, $match_sources, $moves_to_make )  {
-
-					// Remove matching ids
-					if ( ! empty( $match_ids ) && preg_match( '/id=[\\\'\"][^\\\'\"]*(' . $match_ids . ')[^\\\'\"]*[\\\'\"]/i', $matches[0], $tag_match ) ) {
-						$moves_to_make[] = $tag_match[1];
-						return '';
-					}
-
-					// Remove matching hrefs
-					if ( ! empty( $match_sources ) && preg_match( '/href=[\\\'\"][^\\\'\"]*(' . $match_sources . ')[^\\\'\"]*[\\\'\"]/i', $matches[0], $tag_match ) ) {
-						$moves_to_make[] = $tag_match[1];
-						return '';
-					}
-					
-					return $matches[0];
-				},
-				$buffer
+			// Process all stylesheet link and style tags
+			$match_args = array(
+				'tag_regex'			=> '/<link[^>]*rel=[\\\'\"]stylesheet[\\\'\"][^>]*>\n?|<style[^>]*>[\s\S]*?<\/[^>]*style[^>]*>\n?/im',
+				'match_settings'	=> $this->settings['styles'],
+				'match_types'		=> array( 'id', 'href', 'code' )
 			);
-
-			// Process all stylesheet style tags
-			$buffer = preg_replace_callback( 
-				'/<style[^>]*>[\s\S]*?<\/[^>]*style[^>]*>/im', 
-				function( $matches ) use( $match_ids, $match_code, $moves_to_make )  {
-					// Remove matching ids
-					if ( ! empty( $match_ids ) && preg_match( '/id=[\\\'\"][^\\\'\"]*(' . $match_ids . ')[^\\\'\"]*[\\\'\"]/im', $matches[0], $tag_match ) ) {
-						$moves_to_make[] = $tag_match[1];
-						return '';
-					}
-
-					// Remove matching inline stylesheet code
-					if ( ! empty( $match_code ) && preg_match( '/(' . addcslashes( $match_code, '.-' ) . ')/im', $matches[0], $tag_match ) ) {
-						$moves_to_make[] = $tag_match[1];
-						return '';
-					}
-					
-					return $matches[0];
-				},
-				$buffer
-			);
-
+			$buffer = $this->process_buffer_moves( $buffer, $match_args );
 		}
 
-		// Add moved tags to footer.
-		foreach( $moves_to_make as $tag_to_move ) {
-			$buffer = str_replace( '</body>', $tag_to_move . PHP_EOL . '</body>', $buffer );
+		return $buffer;
+	}
+
+	public function process_buffer_moves( $buffer, $args ) {
+		extract( $args );
+
+		$match_strings = array();
+		foreach ( $match_types as $type ) {
+			$match_strings[ $type ] = addcslashes( join( "|", array_column( $match_settings, $type ) ), '/' );
+		}
+
+		$moves_queue = array();
+
+		$buffer = preg_replace_callback( 
+			$tag_regex, 
+			function( $matches ) use( $match_settings, $match_types, $match_strings, &$moves_queue )  {
+				foreach ( $match_types as $type ) {
+					switch( $type ) {
+						case 'id':
+						case 'src':
+						case 'href':
+							if ( ! empty( $match_strings[ $type ] ) && preg_match( '/' . $type . '=[\\\'\"][^\\\'\"]*(' . $match_strings[ $type ] . ')[^\\\'\"]*[\\\'\"]/i', $matches[0] ) ) {
+								$moves_queue[] = $matches[0];
+								return '';
+							}
+							break;
+						case 'code':
+							if ( ! empty( $match_strings[ $type ] ) && preg_match( '/(' . $match_strings[ $type ] . ')/im', $matches[0] ) ) {
+								$moves_queue[] = $matches[0];
+								return '';
+							}
+							break;
+						default:
+							break;
+					}
+				}
+				
+				return $matches[0];
+			},
+			$buffer
+		);
+
+		// Add tags queued for movement to the footer.
+		foreach( $moves_queue as $tag_to_move ) {
+			$buffer = str_replace( '</body>', $tag_to_move . '</body>', $buffer );
 		}
 
 		return $buffer;
