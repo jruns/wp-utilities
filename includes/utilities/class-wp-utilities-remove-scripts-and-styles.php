@@ -36,7 +36,7 @@ class Wp_Utilities_Remove_Scripts_And_Styles {
 			$replacement_args = array(
 				'tag_regex'			=> '/<link[^>]*rel=[\\\'\"]stylesheet[\\\'\"][^>]*>\n?|<style[^>]*>[\s\S]*?<\/[^>]*style[^>]*>\n?/im',
 				'match_settings'	=> $this->settings['styles'],
-				'match_types'		=> array( 'id', 'href' )
+				'match_types'		=> array( 'id', 'href', 'code' )
 			);
 			$buffer = $this->process_buffer_replacements( $buffer, $replacement_args );
 		}
