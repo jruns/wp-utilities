@@ -22,94 +22,62 @@ class Wp_Utilities_Remove_Scripts_And_Styles {
 
 		// Process removals
 		if ( ! empty( $this->settings['scripts'] ) ) {
-			$match_ids =                  join( "|", array_column( $this->settings['scripts'], 'id' ) );
-			$match_sources = addcslashes( join( "|", array_column( $this->settings['scripts'], 'src' ) ), '/' );
-			$match_code =    addcslashes( join( "|", array_column( $this->settings['scripts'], 'code' ) ), '/' );
-
 			// Process all script tags
-			$buffer_replacement_settings = array(
-				'tag_regex'		=> '/<script[^>]*>[\s\S]*?<\/[^>]*script[^>]*>/im',
-				'matches'		=> array(
-					'id' 	=> $match_ids,
-					'src' 	=> $match_sources,
-					'code'	=> $match_code
-				)
+			$replacement_args = array(
+				'tag_regex'			=> '/<script[^>]*>[\s\S]*?<\/[^>]*script[^>]*>\n?/im',
+				'match_settings'	=> $this->settings['scripts'],
+				'match_types'		=> array( 'id', 'src', 'code' )
 			);
-			$buffer = preg_replace_callback( 
-				'/<script[^>]*>[\s\S]*?<\/[^>]*script[^>]*>/im', 
-				function( $matches ) use( $match_ids, $match_sources, $match_code )  {
-
-					// Remove matching ids
-					if ( ! empty( $match_ids ) && preg_match( '/id=[\\\'\"][^\\\'\"]*(' . $match_ids . ')[^\\\'\"]*[\\\'\"]/i', $matches[0] ) ) {
-						return '';
-					}
-
-					// Remove matching src attributes
-					if ( ! empty( $match_sources ) && preg_match( '/src=[\\\'\"][^\\\'\"]*(' . $match_sources . ')[^\\\'\"]*[\\\'\"]/i', $matches[0] ) ) {
-						return '';
-					}
-
-					// Remove matching inline javascript code
-					if ( ! empty( $match_code ) && preg_match( '/(' . $match_code . ')/im', $matches[0] ) ) {
-						return '';
-					}
-					
-					return $matches[0];
-				},
-				$buffer
-			);
+			$buffer = $this->process_buffer_replacements( $buffer, $replacement_args );
 		}
 
 		if ( ! empty( $this->settings['styles'] ) ) {
-			$match_ids = join( "|", array_column( $this->settings['styles'], 'id' ) );
-			$match_sources = addcslashes( join( "|", array_column( $this->settings['styles'], 'href' ) ), '/' );
-			$match_code = addcslashes( join( "|", array_column( $this->settings['styles'], 'code' ) ), '/' );
-
-			// Process all stylesheet link tags
-			$buffer_replacement_settings = array(
-				'tag_regex'		=> '/<link[^>]*rel=[\\\'\"]stylesheet[\\\'\"][^>]*>/i',
-				'id_matches' 	=> $match_ids,
-				'href_matches' 	=> $match_sources
+			// Process all stylesheet link and style tags
+			$replacement_args = array(
+				'tag_regex'			=> '/<link[^>]*rel=[\\\'\"]stylesheet[\\\'\"][^>]*>\n?|<style[^>]*>[\s\S]*?<\/[^>]*style[^>]*>\n?/im',
+				'match_settings'	=> $this->settings['styles'],
+				'match_types'		=> array( 'id', 'href' )
 			);
-			$buffer = preg_replace_callback( 
-				'/<link[^>]*rel=[\\\'\"]stylesheet[\\\'\"][^>]*>/i', 
-				function( $matches ) use( $match_ids, $match_sources )  {
-
-					// Remove matching ids
-					if ( ! empty( $match_ids ) && preg_match( '/id=[\\\'\"][^\\\'\"]*(' . $match_ids . ')[^\\\'\"]*[\\\'\"]/i', $matches[0] ) ) {
-						return '';
-					}
-
-					// Remove matching hrefs
-					if ( ! empty( $match_sources ) && preg_match( '/href=[\\\'\"][^\\\'\"]*(' . $match_sources . ')[^\\\'\"]*[\\\'\"]/i', $matches[0] ) ) {
-						return '';
-					}
-					
-					return $matches[0];
-				},
-				$buffer
-			);
-
-			// Process all stylesheet style tags
-			$buffer = preg_replace_callback( 
-				'/<style[^>]*>[\s\S]*?<\/[^>]*style[^>]*>/im', 
-				function( $matches ) use( $match_ids, $match_code )  {
-					// Remove matching ids
-					if ( ! empty( $match_ids ) && preg_match( '/id=[\\\'\"][^\\\'\"]*(' . $match_ids . ')[^\\\'\"]*[\\\'\"]/im', $matches[0] ) ) {
-						return '';
-					}
-
-					// Remove matching inline stylesheet code
-					if ( ! empty( $match_code ) && preg_match( '/(' . addcslashes( $match_code, '.-' ) . ')/im', $matches[0] ) ) {
-						return '';
-					}
-					
-					return $matches[0];
-				},
-				$buffer
-			);
-
+			$buffer = $this->process_buffer_replacements( $buffer, $replacement_args );
 		}
+
+		return $buffer;
+	}
+
+	public function process_buffer_replacements( $buffer, $args ) {
+		extract( $args );
+
+		$match_strings = array();
+		foreach ( $match_types as $type ) {
+			$match_strings[ $type ] = addcslashes( join( "|", array_column( $match_settings, $type ) ), '/' );
+		}
+
+		$buffer = preg_replace_callback( 
+			$tag_regex, 
+			function( $matches ) use( $match_settings, $match_types, $match_strings )  {
+				foreach ( $match_types as $type ) {
+					switch( $type ) {
+						case 'id':
+						case 'src':
+						case 'href':
+							if ( ! empty( $match_strings[ $type ] ) && preg_match( '/' . $type . '=[\\\'\"][^\\\'\"]*(' . $match_strings[ $type ] . ')[^\\\'\"]*[\\\'\"]/i', $matches[0] ) ) {
+								return '';
+							}
+							break;
+						case 'code':
+							if ( ! empty( $match_strings[ $type ] ) && preg_match( '/(' . $match_strings[ $type ] . ')/im', $matches[0] ) ) {
+								return '';
+							}
+							break;
+						default:
+							break;
+					}
+				}
+				
+				return $matches[0];
+			},
+			$buffer
+		);
 
 		return $buffer;
 	}
