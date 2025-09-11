@@ -65,9 +65,9 @@ function move_scripts_and_styles_to_footer( $settings ) {
 add_filter( 'wp_utilities_scripts_and_styles_to_move_to_footer', 'move_scripts_and_styles_to_footer', 10, 1 );
 ```
 
-Available search types for scripts: `id`, `src`, `code`  
-Available search types for styles (style and link tags): `id`, `href`, `code`  
-Available `match` options: most WP conditionals, and `path_` or `not_path_` for matching url path  
+Available tag attributes/sections to search for matching scripts: `id`, `src`, `code`  
+Available tag attributes/sections to search for matching styles (style and link tags): `id`, `href`, `code`  
+Available page `match` options: most WP conditionals, and `path_` or `not_path_` for matching url path  
 
 ### Remove Scripts and Styles
 This utility will remove specified javascript scripts and css styles from the frontend. It does not remove them from the admin section.  
@@ -111,6 +111,6 @@ function remove_scripts_and_styles( $settings ) {
 add_filter( 'wp_utilities_scripts_and_styles_to_remove', 'remove_scripts_and_styles', 10, 1 );
 ```
 
-Available search types for scripts: `id`, `src`, `code`  
-Available search types for styles (style and link tags): `id`, `href`, `code`  
-Available `match` options: most WP conditionals, and `path_` or `not_path_` for matching url path  
+Available tag attributes/sections to search for matching scripts: `id`, `src`, `code`  
+Available tag attributes/sections to search for matching styles (style and link tags): `id`, `href`, `code`  
+Available page `match` options: most WP conditionals, and `path_` or `not_path_` for matching url path  
