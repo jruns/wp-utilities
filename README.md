@@ -23,10 +23,54 @@ define( 'WP_UTILITIES_ENABLE_YOUTUBE_FACADE', true );
 
 Or activate the utility on the WP Performance Utilities wp-admin options page.
 
+### Move Scripts and Styles to Footer
+This utility will move specified javascript scripts and css styles to the page footer on the frontend. It does not move them in the admin section.  
+
+Add this to your wp-config.php file:  
+```php
+define( 'WP_UTILITIES_MOVE_SCRIPTS_AND_STYLES_TO_FOOTER', true );
+```
+
+Then specify scripts and styles to be moved with the `wp_utilities_scripts_and_styles_to_move_to_footer` filter by adding something like the following to your functions.php file:  
+```php
+function move_scripts_and_styles_to_footer( $settings ) {
+    $settings['scripts'][] = array ( 
+        'id'        => 'ez-toc',
+        'match'     => 'not_is_page'
+    );
+    $settings['scripts'][] = array ( 
+        'src'       => 'js/smooth_scroll.min.js',
+        'match'     => 'path_sample-page'
+    );
+    $settings['scripts'][] = array ( 
+        'code'      => 'eztoc_smooth_local',
+        'match'     => 'is_front_page'
+    );
+
+    $settings['styles'][] = array ( 
+        'id'        => 'kadence-header',
+        'match'     => 'is_page'
+    );
+    $settings['styles'][] = array ( 
+        'href'      => '/kadence/assets/css/content.min.css',
+        'match'     => 'not_is_page'
+    );
+    $settings['styles'][] = array ( 
+        'code'      => '.tablepress thead',
+        'match'     => 'not_is_page'
+    );
+
+    return $settings;
+}
+add_filter( 'wp_utilities_scripts_and_styles_to_move_to_footer', 'move_scripts_and_styles_to_footer', 10, 1 );
+```
+
+Available tag attributes/sections to search for matching scripts: `id`, `src`, `code`  
+Available tag attributes/sections to search for matching styles (style and link tags): `id`, `href`, `code`  
+Available page `match` options: most WP conditionals, and `path_` or `not_path_` for matching url path  
+
 ### Remove Scripts and Styles
 This utility will remove specified javascript scripts and css styles from the frontend. It does not remove them from the admin section.  
-
-This is a work in progress.
 
 Add this to your wp-config.php file:  
 ```php
@@ -67,12 +111,6 @@ function remove_scripts_and_styles( $settings ) {
 add_filter( 'wp_utilities_scripts_and_styles_to_remove', 'remove_scripts_and_styles', 10, 1 );
 ```
 
-## To Do
-1. Add support for matching conditionals when modifying a script or style
-2. Simplify code that removes script or style tags when configured conditionals match. Use reusable functions for common commands.
-3. Remove script by handle, source code, or filename, and by conditional or page parameters (slug, root folder, child folder)
-4. Remove stylesheet by handle, inline code, or filename, and by conditional or page parameters (slug, root folder, child folder)
-5. Move script or stylesheet to footer by handle, inline code, or filename.
-6. Delay script by handle or filename, and by conditional or page parameters (slug, root folder, child folder)
-7. Delay stylesheet by handle or filename, and by conditional or page parameters (slug, root folder, child folder)
-8. Cleanup plugin code, restructure code, and remove unneeded code.
+Available tag attributes/sections to search for matching scripts: `id`, `src`, `code`  
+Available tag attributes/sections to search for matching styles (style and link tags): `id`, `href`, `code`  
+Available page `match` options: most WP conditionals, and `path_` or `not_path_` for matching url path  

@@ -150,6 +150,6 @@ END;
 	 * @since    0.2.0
 	 */
 	public function run() {
-		add_filter( 'wp_utilities_modify_final_output', array( $this, 'process_youtube_iframes' ), 9 );
+		add_filter( 'wp_utilities_modify_final_output', array( $this, 'process_youtube_iframes' ), 8 );
 	}
 }
