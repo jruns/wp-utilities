@@ -23,22 +23,22 @@ class Wp_Utilities_Remove_Scripts_And_Styles {
 		// Process removals
 		if ( ! empty( $this->settings['scripts'] ) ) {
 			// Process all script tags
-			$replacement_args = array(
+			$match_args = array(
 				'tag_regex'			=> '/<script[^>]*>[\s\S]*?<\/[^>]*script[^>]*>\n?/im',
 				'match_settings'	=> $this->settings['scripts'],
 				'match_types'		=> array( 'id', 'src', 'code' )
 			);
-			$buffer = $this->process_buffer_replacements( $buffer, $replacement_args );
+			$buffer = $this->process_buffer_replacements( $buffer, $match_args );
 		}
 
 		if ( ! empty( $this->settings['styles'] ) ) {
 			// Process all stylesheet link and style tags
-			$replacement_args = array(
+			$match_args = array(
 				'tag_regex'			=> '/<link[^>]*rel=[\\\'\"]stylesheet[\\\'\"][^>]*>\n?|<style[^>]*>[\s\S]*?<\/[^>]*style[^>]*>\n?/im',
 				'match_settings'	=> $this->settings['styles'],
 				'match_types'		=> array( 'id', 'href', 'code' )
 			);
-			$buffer = $this->process_buffer_replacements( $buffer, $replacement_args );
+			$buffer = $this->process_buffer_replacements( $buffer, $match_args );
 		}
 
 		return $buffer;
