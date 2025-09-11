@@ -98,6 +98,6 @@ class Wp_Utilities_Move_Scripts_And_Styles_To_Footer {
 	 */
 	public function run() {
 		// Iterate over scripts and styles to move to the footer
-		add_filter( 'wp_utilities_modify_final_output', array( $this, 'process_moves' ), 9 );
+		add_filter( 'wp_utilities_modify_final_output', array( $this, 'process_moves' ), 6 );
 	}
 }
