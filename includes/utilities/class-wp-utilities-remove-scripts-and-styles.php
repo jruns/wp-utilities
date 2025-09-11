@@ -26,9 +26,10 @@ class Wp_Utilities_Remove_Scripts_And_Styles {
 			$match_args = array(
 				'tag_regex'			=> '/<script[^>]*>[\s\S]*?<\/[^>]*script[^>]*>\n?/im',
 				'match_settings'	=> $this->settings['scripts'],
-				'match_types'		=> array( 'id', 'src', 'code' )
+				'match_types'		=> array( 'id', 'src', 'code' ),
+				'operation'			=> 'remove'
 			);
-			$buffer = $this->process_buffer_replacements( $buffer, $match_args );
+			$buffer = Wp_Utilities_Html_Buffer::process_buffer_replacements( $buffer, $match_args );
 		}
 
 		if ( ! empty( $this->settings['styles'] ) ) {
@@ -36,48 +37,11 @@ class Wp_Utilities_Remove_Scripts_And_Styles {
 			$match_args = array(
 				'tag_regex'			=> '/<link[^>]*rel=[\\\'\"]stylesheet[\\\'\"][^>]*>\n?|<style[^>]*>[\s\S]*?<\/[^>]*style[^>]*>\n?/im',
 				'match_settings'	=> $this->settings['styles'],
-				'match_types'		=> array( 'id', 'href', 'code' )
+				'match_types'		=> array( 'id', 'href', 'code' ),
+				'operation'			=> 'remove'
 			);
-			$buffer = $this->process_buffer_replacements( $buffer, $match_args );
+			$buffer = Wp_Utilities_Html_Buffer::process_buffer_replacements( $buffer, $match_args );
 		}
-
-		return $buffer;
-	}
-
-	public function process_buffer_replacements( $buffer, $args ) {
-		extract( $args );
-
-		$match_strings = array();
-		foreach ( $match_types as $type ) {
-			$match_strings[ $type ] = addcslashes( join( "|", array_column( $match_settings, $type ) ), '/' );
-		}
-
-		$buffer = preg_replace_callback( 
-			$tag_regex, 
-			function( $matches ) use( $match_settings, $match_types, $match_strings )  {
-				foreach ( $match_types as $type ) {
-					switch( $type ) {
-						case 'id':
-						case 'src':
-						case 'href':
-							if ( ! empty( $match_strings[ $type ] ) && preg_match( '/' . $type . '=[\\\'\"][^\\\'\"]*(' . $match_strings[ $type ] . ')[^\\\'\"]*[\\\'\"]/i', $matches[0] ) ) {
-								return '';
-							}
-							break;
-						case 'code':
-							if ( ! empty( $match_strings[ $type ] ) && preg_match( '/(' . $match_strings[ $type ] . ')/im', $matches[0] ) ) {
-								return '';
-							}
-							break;
-						default:
-							break;
-					}
-				}
-				
-				return $matches[0];
-			},
-			$buffer
-		);
 
 		return $buffer;
 	}

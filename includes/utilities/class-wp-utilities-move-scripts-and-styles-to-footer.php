@@ -26,9 +26,10 @@ class Wp_Utilities_Move_Scripts_And_Styles_To_Footer {
 			$match_args = array(
 				'tag_regex'			=> '/<script[^>]*>[\s\S]*?<\/[^>]*script[^>]*>\n?/im',
 				'match_settings'	=> $this->settings['scripts'],
-				'match_types'		=> array( 'id', 'src', 'code' )
+				'match_types'		=> array( 'id', 'src', 'code' ),
+				'operation'			=> 'move_to_footer'
 			);
-			$buffer = $this->process_buffer_moves( $buffer, $match_args );
+			$buffer = Wp_Utilities_Html_Buffer::process_buffer_replacements( $buffer, $match_args );
 		}
 
 		if ( ! empty( $this->settings['styles'] ) ) {
@@ -36,56 +37,10 @@ class Wp_Utilities_Move_Scripts_And_Styles_To_Footer {
 			$match_args = array(
 				'tag_regex'			=> '/<link[^>]*rel=[\\\'\"]stylesheet[\\\'\"][^>]*>\n?|<style[^>]*>[\s\S]*?<\/[^>]*style[^>]*>\n?/im',
 				'match_settings'	=> $this->settings['styles'],
-				'match_types'		=> array( 'id', 'href', 'code' )
+				'match_types'		=> array( 'id', 'href', 'code' ),
+				'operation'			=> 'move_to_footer'
 			);
-			$buffer = $this->process_buffer_moves( $buffer, $match_args );
-		}
-
-		return $buffer;
-	}
-
-	public function process_buffer_moves( $buffer, $args ) {
-		extract( $args );
-
-		$match_strings = array();
-		foreach ( $match_types as $type ) {
-			$match_strings[ $type ] = addcslashes( join( "|", array_column( $match_settings, $type ) ), '/' );
-		}
-
-		$moves_queue = array();
-
-		$buffer = preg_replace_callback( 
-			$tag_regex, 
-			function( $matches ) use( $match_settings, $match_types, $match_strings, &$moves_queue )  {
-				foreach ( $match_types as $type ) {
-					switch( $type ) {
-						case 'id':
-						case 'src':
-						case 'href':
-							if ( ! empty( $match_strings[ $type ] ) && preg_match( '/' . $type . '=[\\\'\"][^\\\'\"]*(' . $match_strings[ $type ] . ')[^\\\'\"]*[\\\'\"]/i', $matches[0] ) ) {
-								$moves_queue[] = $matches[0];
-								return '';
-							}
-							break;
-						case 'code':
-							if ( ! empty( $match_strings[ $type ] ) && preg_match( '/(' . $match_strings[ $type ] . ')/im', $matches[0] ) ) {
-								$moves_queue[] = $matches[0];
-								return '';
-							}
-							break;
-						default:
-							break;
-					}
-				}
-				
-				return $matches[0];
-			},
-			$buffer
-		);
-
-		// Add tags queued for movement to the footer.
-		foreach( $moves_queue as $tag_to_move ) {
-			$buffer = str_replace( '</body>', $tag_to_move . '</body>', $buffer );
+			$buffer = Wp_Utilities_Html_Buffer::process_buffer_replacements( $buffer, $match_args );
 		}
 
 		return $buffer;
