@@ -41,10 +41,14 @@ class Wp_Utilities_Html_Buffer {
 		extract( $args );
 
 		$match_strings = array();
+		// Expand match strings into an OR statement
 		foreach ( $match_types as $type ) {
-			$matches = array_map( function( $value ) { 
+			$matches = array_map( 
+				function( $value ) { 
 					return is_array( $value ) ? join( "|", $value ) : $value; 
-			}, array_column( $match_settings, $type ) );
+				},
+				array_column( $match_settings, $type ) 
+			);
 			$match_strings[ $type ] = addcslashes( join( "|", $matches ), '/' );
 		}
 
