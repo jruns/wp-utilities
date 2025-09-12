@@ -43,13 +43,13 @@ class Wp_Utilities_Html_Buffer {
 		$match_strings = array();
 		// Expand match strings into an OR statement
 		foreach ( $match_types as $type ) {
-			$matches = array_map( 
+			$match_array = array_map( 
 				function( $value ) { 
 					return is_array( $value ) ? join( "|", $value ) : $value; 
 				},
 				array_column( $match_settings, $type ) 
 			);
-			$match_strings[ $type ] = addcslashes( join( "|", $matches ), '/' );
+			$match_strings[ $type ] = addcslashes( join( "|", $match_array ), '/' );
 		}
 
 		$moves_queue = array();
