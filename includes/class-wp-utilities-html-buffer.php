@@ -42,7 +42,10 @@ class Wp_Utilities_Html_Buffer {
 
 		$match_strings = array();
 		foreach ( $match_types as $type ) {
-			$match_strings[ $type ] = addcslashes( join( "|", array_column( $match_settings, $type ) ), '/' );
+			$matches = array_map( function( $value ) { 
+					return is_array( $value ) ? join( "|", $value ) : $value; 
+			}, array_column( $match_settings, $type ) );
+			$match_strings[ $type ] = addcslashes( join( "|", $matches ), '/' );
 		}
 
 		$moves_queue = array();
