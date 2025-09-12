@@ -48,7 +48,7 @@ function move_scripts_and_styles_to_footer( $settings ) {
     );
 
     $settings['styles'][] = array ( 
-        'id'        => 'kadence-header',
+        'id'        => array( 'kadence-header', 'wp-block-library' ),
         'match'     => 'is_page'
     );
     $settings['styles'][] = array ( 
@@ -67,7 +67,10 @@ add_filter( 'wp_utilities_scripts_and_styles_to_move_to_footer', 'move_scripts_a
 
 Available tag attributes/sections to search for matching scripts: `id`, `src`, `code`  
 Available tag attributes/sections to search for matching styles (style and link tags): `id`, `href`, `code`  
-Available page `match` options: most WP conditionals, and `path_` or `not_path_` for matching url path  
+Tag attributes/sections can be searched for a specific string or an array of strings that can match multiple tags. Ex: `'id' => 'kadence-header'` or `'id' => array( 'kadence-header', 'wp-block-library' )`
+
+Available `match` options: `all` for matching all posts/pages, select WP conditionals, and `path_` or `not_path_` for matching url path  
+Available WP conditionals: is_home, is_front_page, is_single, is_page, is_author, is_archive, has_excerpt, is_search, is_404, is_paged, is_attachment, is_singular, is_user_logged_in, not_is_home, not_is_front_page, not_is_single, not_is_page, not_is_author, not_is_archive, not_has_excerpt, not_is_search, not_is_404, not_is_paged, not_is_attachment, not_is_singular, not_is_user_logged_in  
 
 ### Remove Scripts and Styles
 This utility will remove specified javascript scripts and css styles from the frontend. It does not remove them from the admin section.  
@@ -94,7 +97,7 @@ function remove_scripts_and_styles( $settings ) {
     );
 
     $settings['styles'][] = array ( 
-        'id'        => 'kadence-header',
+        'id'        => array( 'kadence-header', 'wp-block-library' ),
         'match'     => 'is_page'
     );
     $settings['styles'][] = array ( 
@@ -113,4 +116,7 @@ add_filter( 'wp_utilities_scripts_and_styles_to_remove', 'remove_scripts_and_sty
 
 Available tag attributes/sections to search for matching scripts: `id`, `src`, `code`  
 Available tag attributes/sections to search for matching styles (style and link tags): `id`, `href`, `code`  
-Available page `match` options: most WP conditionals, and `path_` or `not_path_` for matching url path  
+Tag attributes/sections can be searched for a specific string or an array of strings that can match multiple tags. Ex: `'id' => 'kadence-header'` or `'id' => array( 'kadence-header', 'wp-block-library' )`
+
+Available `match` options: `all` for matching all posts/pages, select WP conditionals, and `path_` or `not_path_` for matching url path  
+Available WP conditionals: is_home, is_front_page, is_single, is_page, is_author, is_archive, has_excerpt, is_search, is_404, is_paged, is_attachment, is_singular, is_user_logged_in, not_is_home, not_is_front_page, not_is_single, not_is_page, not_is_author, not_is_archive, not_has_excerpt, not_is_search, not_is_404, not_is_paged, not_is_attachment, not_is_singular, not_is_user_logged_in  

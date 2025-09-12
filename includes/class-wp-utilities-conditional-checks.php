@@ -43,7 +43,10 @@ class Wp_Utilities_Conditional_Checks {
 					$negate = true;
 				}
 
-				if ( 0 === strpos( $conditional, 'path_' ) ) {
+				if ( 'all' === $conditional ) {
+					// Match all pages if conditional is set to 'all'
+					return $carry && true;
+				} else if ( 0 === strpos( $conditional, 'path_' ) ) {
 					$conditional = substr( $conditional, 5 );
 					return $negate ? ( $carry && ! substr( $url_path, 0, strlen( $conditional ) ) === $conditional ) : ( $carry && substr( $url_path, 0, strlen( $conditional ) ) === $conditional );
 				} elseif ( ! in_array( $conditional, $allowed_conditionals ) ) {
