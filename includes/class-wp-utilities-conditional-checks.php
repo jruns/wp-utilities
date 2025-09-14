@@ -27,6 +27,7 @@ class Wp_Utilities_Conditional_Checks {
 		$url_path = sanitize_title( str_replace( '/', '_', parse_url( $wp->request )['path'] ) );
 
 		return array_filter( $matches, function( $value ) use( $allowed_conditionals, $url_path ) {
+			// Default to match all posts/pages if match key is not set
 			if ( ! array_key_exists( 'match', $value ) ) {
 				return true;
 			}
