@@ -57,32 +57,28 @@ class Wp_Utilities_Html_Buffer {
 		$buffer = preg_replace_callback( 
 			$tag_regex, 
 			function( $matches ) use( $operation, $match_settings, $match_types, $match_strings, &$moves_queue )  {
+				$tag_contents = $matches[0];
+
 				foreach ( $match_types as $type ) {
-					switch( $type ) {
-						case 'id':
-						case 'src':
-						case 'href':
-							if ( ! empty( $match_strings[ $type ] ) && preg_match( '/' . $type . '=[\\\'\"][^\\\'\"]*(' . $match_strings[ $type ] . ')[^\\\'\"]*[\\\'\"]/i', $matches[0] ) ) {
-								if ( $operation === 'move_to_footer' ) {
-									$moves_queue[] = $matches[0];
-								}
-								return '';
-							}
-							break;
-						case 'code':
-							if ( ! empty( $match_strings[ $type ] ) && preg_match( '/(' . $match_strings[ $type ] . ')/im', $matches[0] ) ) {
-								if ( $operation === 'move_to_footer' ) {
-									$moves_queue[] = $matches[0];
-								}
-								return '';
-							}
-							break;
-						default:
-							break;
+					if ( 'code' === $type ) {
+						$regex_string = '/(' . $match_strings[ $type ] . ')/im';
+					} else {
+						$regex_string = '/' . $type . '=[\\\'\"][^\\\'\"]*(' . $match_strings[ $type ] . ')[^\\\'\"]*[\\\'\"]/i';
 					}
-				}
+
+					if ( ! empty( $match_strings[ $type ] ) && preg_match( $regex_string, $tag_contents ) ) {
+						if ( $operation === 'delay' ) {
+						} else {
+							if ( $operation === 'move_to_footer' ) {
+								$moves_queue[] = $tag_contents;
+							}
+
+							// Remove existing tag
+							$tag_contents = '';
+						}
+					}
 				
-				return $matches[0];
+				return $tag_contents;
 			},
 			$buffer
 		);
