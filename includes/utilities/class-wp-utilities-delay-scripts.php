@@ -11,7 +11,7 @@ class Wp_Utilities_Delay_Scripts {
 			'scripts'	=> array()
 		);
 
-		$this->settings = apply_filters( 'wp_utilities_delay_scripts', $this->settings );
+		$this->settings = apply_filters( 'wp_utilities_scripts_to_delay', $this->settings );
 	}
 
 	public function process_delays( $buffer ) {
