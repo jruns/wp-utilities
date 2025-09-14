@@ -49,7 +49,7 @@ class Wp_Utilities_Html_Buffer {
 				},
 				array_column( $match_settings, $type ) 
 			);
-			$match_strings[ $type ] = addcslashes( join( "|", $match_array ), '/' );
+			$match_strings[ $type ] = addcslashes( join( "|", $match_array ), '/()[]{}.,+*^$' );
 		}
 
 		$moves_queue = array();
@@ -67,7 +67,10 @@ class Wp_Utilities_Html_Buffer {
 					}
 
 					if ( ! empty( $match_strings[ $type ] ) && preg_match( $regex_string, $tag_contents ) ) {
-						if ( $operation === 'delay' ) {
+						if ( $operation === 'delay' && 1 !== preg_match( '/<script[^>]*nodelay|nowprocket[^>]*>/im', $tag_contents ) ) {
+							if ( 0 === preg_match( '/<script[^>]* defer[^>]*>/im', $tag_contents ) ) {
+								$tag_contents = str_replace( '<script', '<script defer', $tag_contents );
+							}
 						} else {
 							if ( $operation === 'move_to_footer' ) {
 								$moves_queue[] = $tag_contents;
@@ -76,7 +79,11 @@ class Wp_Utilities_Html_Buffer {
 							// Remove existing tag
 							$tag_contents = '';
 						}
+
+						// Stop checking match types because we found a match
+						break;
 					}
+				}
 				
 				return $tag_contents;
 			},
