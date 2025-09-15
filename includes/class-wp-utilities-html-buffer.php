@@ -68,7 +68,7 @@ class Wp_Utilities_Html_Buffer {
 
 					if ( ! empty( $match_strings[ $type ] ) && preg_match( $regex_string, $tag_contents ) ) {
 						if ( $operation === 'delay' ) {
-							if ( 1 !== preg_match( '/<script[^>]*nodelay|nowprocket[^>]*>/im', $tag_contents ) ) {
+							if ( 1 !== preg_match( '/<script[^>]*nodelay|nowprocket|data-pagespeed-no-defer[^>]*>/im', $tag_contents ) ) {
 								if ( 0 === preg_match( '/<script[^>]* defer[^>]*>/im', $tag_contents ) ) {
 									$tag_contents = str_replace( '<script', '<script defer', $tag_contents );
 								}
