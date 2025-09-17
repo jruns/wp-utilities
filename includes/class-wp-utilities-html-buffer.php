@@ -52,11 +52,17 @@ class Wp_Utilities_Html_Buffer {
 			$match_strings[ $type ] = addcslashes( join( "|", $match_array ), '/()[]{}.,+*^$' );
 		}
 
+		if ( ! empty( $exclusions ) ) {
+			$exclusions = join( '|', $exclusions );
+		} else {
+			$exclusions = null;
+		}
+
 		$moves_queue = array();
 
 		$buffer = preg_replace_callback( 
 			$tag_regex, 
-			function( $matches ) use( $operation, $match_settings, $match_types, $match_strings, &$moves_queue )  {
+			function( $matches ) use( $operation, $match_settings, $match_types, $match_strings, $exclusions, &$moves_queue )  {
 				$tag_contents = $matches[0];
 
 				foreach ( $match_types as $type ) {
@@ -68,8 +74,7 @@ class Wp_Utilities_Html_Buffer {
 
 					if ( ! empty( $match_strings[ $type ] ) && preg_match( $regex_string, $tag_contents ) ) {
 						if ( $operation === 'delay' ) {
-							$exclusion_attributes = array( 'nodelay', 'nowprocket', 'data-pagespeed-no-defer' );
-							if ( 1 !== preg_match( '/<script[^>]*' . join( '|', $exclusion_attributes ) . '[^>]*>/im', $tag_contents ) ) {
+							if ( empty( $exclusions ) || 1 !== preg_match( '/<script[^>]*' . $exclusions . '[^>]*>/im', $tag_contents ) ) {
 								if ( 0 === preg_match( '/<script[^>]* defer[^>]*>/im', $tag_contents ) ) {
 									$tag_contents = str_replace( '<script', '<script defer', $tag_contents );
 								}

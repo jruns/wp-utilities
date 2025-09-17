@@ -6,6 +6,8 @@ class Wp_Utilities_Delay_Scripts {
 
 	public static $needs_html_buffer = true;
 
+	public const EXCLUSIONS = array( 'nodelay', 'nowprocket', 'data-pagespeed-no-defer' );
+
 	public function __construct() {
 		$this->settings = array(
 			'scripts'	=> array()
@@ -25,8 +27,10 @@ class Wp_Utilities_Delay_Scripts {
 				'tag_regex'			=> '/<script[^>]*>[\s\S]*?<\/[^>]*script[^>]*>\n?/im',
 				'match_settings'	=> $this->settings['scripts'],
 				'match_types'		=> array( 'id', 'src', 'code' ),
-				'operation'			=> 'delay'
+				'operation'			=> 'delay',
+				'exclusions'		=> self::EXCLUSIONS
 			);
+
 			$buffer = Wp_Utilities_Html_Buffer::process_buffer_replacements( $buffer, $match_args );
 		}
 
