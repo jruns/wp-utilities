@@ -41,6 +41,7 @@ class Wp_Utilities_Html_Buffer {
 		extract( $args );
 
 		$moves_queue = array();
+		$insert_delay_script = false;
 
 		if ( ! empty( $exclusions ) ) {
 			$exclusions = join( '|', $exclusions );
@@ -78,7 +79,7 @@ class Wp_Utilities_Html_Buffer {
 
 			$buffer = preg_replace_callback( 
 				$regex_string, 
-				function( $matches ) use( $operation, $tag_type, $search_string, $ele, $exclusions, &$moves_queue )  {
+				function( $matches ) use( $operation, $tag_type, $search_string, $ele, $exclusions, &$moves_queue, &$insert_delay_script )  {
 					$tag_contents = $matches[0];
 
 					if ( 'code' === $ele['match'] ) {
@@ -98,6 +99,8 @@ class Wp_Utilities_Html_Buffer {
 								if ( array_key_exists( 'operation', $ele['args'] ) && 'user_interaction' === $ele['args']['operation'] ) {
 									// delay until user interaction
 									if ( 'script' === $tag_type ) {
+										$tag_contents = str_replace( 'src=', 'data-type="lazy" data-src=', $tag_contents );
+										$insert_delay_script = true;
 									}
 								}
 							}
@@ -120,6 +123,23 @@ class Wp_Utilities_Html_Buffer {
 		// Add tags queued for movement to the footer.
 		foreach( $moves_queue as $tag_to_move ) {
 			$buffer = str_replace( '</body>', $tag_to_move . '</body>', $buffer );
+		}
+
+		// Add user interaction delay script if needed
+		if ( $insert_delay_script ) {
+			$delay_script = '<script>
+{
+    const load = () => document.querySelectorAll("script[data-type=\'lazy\']").forEach(el => el.src = el.dataset.src);
+    const timer = setTimeout(load, 15000);
+    const trigger = () => {
+        load();
+        clearTimeout(timer);
+    };
+    ["mouseover","keydown","touchmove","touchstart"].forEach(e => window.addEventListener(e, trigger, {passive: true, once: true}));
+}
+</script>';
+
+			$buffer = str_replace( '</body>', $delay_script . '</body>', $buffer );
 		}
 
 		return $buffer;
