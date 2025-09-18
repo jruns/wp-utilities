@@ -40,17 +40,7 @@ class Wp_Utilities_Html_Buffer {
 	public static function process_buffer_replacements( $buffer, $args ) {
 		extract( $args );
 
-		$match_strings = array();
-		// Expand match strings into an OR statement
-		foreach ( $match_types as $type ) {
-			$match_array = array_map( 
-				function( $value ) { 
-					return is_array( $value ) ? join( "|", $value ) : $value; 
-				},
-				array_column( $match_settings, $type ) 
-			);
-			$match_strings[ $type ] = addcslashes( join( "|", $match_array ), '/()[]{}.,+*^$' );
-		}
+		$moves_queue = array();
 
 		if ( ! empty( $exclusions ) ) {
 			$exclusions = join( '|', $exclusions );
@@ -58,45 +48,66 @@ class Wp_Utilities_Html_Buffer {
 			$exclusions = null;
 		}
 
-		$moves_queue = array();
+		foreach ( $match_settings as $ele ) {
+			// skip element if it is missing required keys or has unallowed values
+			if ( ! array_key_exists( 'match', $ele ) || ! array_key_exists( 'find', $ele ) || ! in_array( $ele['match'], $match_types ) ) {
+				continue;
+			}
 
-		$buffer = preg_replace_callback( 
-			$tag_regex, 
-			function( $matches ) use( $operation, $match_settings, $match_types, $match_strings, $exclusions, &$moves_queue )  {
-				$tag_contents = $matches[0];
+			// Turn array search options into an OR string
+			if ( is_array( $ele['find'] ) ) {
+				$ele['find'] = join( "|", $ele['find'] );
+			}
+			$search_string = addcslashes( $ele['find'], '/()[]{}.,+*^$' );
 
-				foreach ( $match_types as $type ) {
-					if ( 'code' === $type ) {
-						$regex_string = '/(' . $match_strings[ $type ] . ')/im';
-					} else {
-						$regex_string = '/' . $type . '=[\\\'\"][^\\\'\"]*(' . $match_strings[ $type ] . ')[^\\\'\"]*[\\\'\"]/i';
+			if ( 'code' === $ele['match'] ) {
+				if ( 'script' === $tag_type ) {
+					$regex_string = '/<script[^>]*?>(?!<\/[^>]*script[^>]*?)[\s\S]+?<\/[^>]*script[^>]*?>\n?/im';
+				} else {
+					$regex_string = '/<style[^>]*?>(?!<\/[^>]*script[^>]*?)[\s\S]+?<\/[^>]*style[^>]*?>\n?/im';
+				}
+			} else {
+				$regex_base = $ele['match'] . '=[\\\'\"][^\\\'\"]*(' . $search_string . ')[^\\\'\"]*[\\\'\"]';
+				
+				if ( 'script' === $tag_type ) {
+					$regex_string = '/<script[^>]*?' . $regex_base . '[^>]*?>[\s\S]*?<\/[^>]*script[^>]*>\n?/im';
+				} else {
+					$regex_string = '/<link[^>]*?' . $regex_base . '[^>]*?rel=[\\\'\"]stylesheet[\\\'\"][^>]*?>\n?|<link[^>]*?rel=[\\\'\"]stylesheet[\\\'\"][^>]*' . $regex_base . '[^>]*?>\n?|<style[^>]*?' . $regex_base . '[^>]*?>[\s\S]*?<\/[^>]*style[^>]*>\n?/im';
+				}
+			}
+
+			$buffer = preg_replace_callback( 
+				$regex_string, 
+				function( $matches ) use( $operation, $search_string, $ele, $exclusions, &$moves_queue )  {
+					$tag_contents = $matches[0];
+
+					if ( 'code' === $ele['match'] ) {
+						// Check if code section matches search settings. Skip tag if it doesn't.
+						if ( 0 === preg_match( '/(' . $search_string . ')/im', $tag_contents ) ) {
+							return $tag_contents;
+						}
 					}
 
-					if ( ! empty( $match_strings[ $type ] ) && preg_match( $regex_string, $tag_contents ) ) {
-						if ( $operation === 'delay' ) {
-							if ( empty( $exclusions ) || 1 !== preg_match( '/<script[^>]*' . $exclusions . '[^>]*>/im', $tag_contents ) ) {
-								if ( 0 === preg_match( '/<script[^>]* defer[^>]*>/im', $tag_contents ) ) {
-									$tag_contents = str_replace( '<script', '<script defer', $tag_contents );
-								}
+					if ( $operation === 'delay' ) {
+						if ( empty( $exclusions ) || 1 !== preg_match( '/<script[^>]*' . $exclusions . '[^>]*>/im', $tag_contents ) ) {
+							if ( 0 === preg_match( '/<script[^>]* defer[^>]*>/im', $tag_contents ) ) {
+								$tag_contents = str_replace( '<script', '<script defer', $tag_contents );
 							}
-						} else {
-							if ( $operation === 'move_to_footer' ) {
-								$moves_queue[] = $tag_contents;
-							}
-
-							// Remove existing tag
-							$tag_contents = '';
+						}
+					} else {
+						if ( $operation === 'move_to_footer' ) {
+							$moves_queue[] = $tag_contents;
 						}
 
-						// Stop checking match types because we found a match
-						break;
+						// Remove existing tag
+						$tag_contents = '';
 					}
-				}
-				
-				return $tag_contents;
-			},
-			$buffer
-		);
+					
+					return $tag_contents;
+				},
+				$buffer
+			);
+		}
 
 		// Add tags queued for movement to the footer.
 		foreach( $moves_queue as $tag_to_move ) {

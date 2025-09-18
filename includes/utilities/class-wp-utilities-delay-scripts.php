@@ -24,7 +24,7 @@ class Wp_Utilities_Delay_Scripts {
 		if ( ! empty( $this->settings['scripts'] ) ) {
 			// Process all script tags
 			$match_args = array(
-				'tag_regex'			=> '/<script[^>]*>[\s\S]*?<\/[^>]*script[^>]*>\n?/im',
+				'tag_type'			=> 'script',
 				'match_settings'	=> $this->settings['scripts'],
 				'match_types'		=> array( 'id', 'src', 'code' ),
 				'operation'			=> 'delay',
