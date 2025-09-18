@@ -127,10 +127,11 @@ class Wp_Utilities_Html_Buffer {
 
 		// Add user interaction delay script if needed
 		if ( $insert_delay_script ) {
+			$autoLoadTimeout = 15000;
 			$delay_script = '<script>
 {
     const load = () => document.querySelectorAll("script[data-type=\'lazy\']").forEach(el => el.src = el.dataset.src);
-    const timer = setTimeout(load, 15000);
+    const timer = setTimeout(load, ' . $autoLoadTimeout . ');
     const trigger = () => {
         load();
         clearTimeout(timer);
