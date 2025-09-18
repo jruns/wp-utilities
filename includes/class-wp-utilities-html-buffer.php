@@ -78,7 +78,7 @@ class Wp_Utilities_Html_Buffer {
 
 			$buffer = preg_replace_callback( 
 				$regex_string, 
-				function( $matches ) use( $operation, $search_string, $ele, $exclusions, &$moves_queue )  {
+				function( $matches ) use( $operation, $tag_type, $search_string, $ele, $exclusions, &$moves_queue )  {
 					$tag_contents = $matches[0];
 
 					if ( 'code' === $ele['match'] ) {
@@ -92,6 +92,14 @@ class Wp_Utilities_Html_Buffer {
 						if ( empty( $exclusions ) || 1 !== preg_match( '/<script[^>]*' . $exclusions . '[^>]*>/im', $tag_contents ) ) {
 							if ( 0 === preg_match( '/<script[^>]* defer[^>]*>/im', $tag_contents ) ) {
 								$tag_contents = str_replace( '<script', '<script defer', $tag_contents );
+							}
+
+							if ( array_key_exists( 'args', $ele ) && ! empty( $ele['args'] ) ) {
+								if ( array_key_exists( 'operation', $ele['args'] ) && 'user_interaction' === $ele['args']['operation'] ) {
+									// delay until user interaction
+									if ( 'script' === $tag_type ) {
+									}
+								}
 							}
 						}
 					} else {
