@@ -96,11 +96,26 @@ class Wp_Utilities_Html_Buffer {
 							}
 
 							if ( array_key_exists( 'args', $ele ) && ! empty( $ele['args'] ) ) {
-								if ( array_key_exists( 'operation', $ele['args'] ) && 'user_interaction' === $ele['args']['operation'] ) {
-									// delay until user interaction
-									if ( 'script' === $tag_type ) {
-										$tag_contents = str_replace( 'src=', 'data-type="lazy" data-src=', $tag_contents );
-										$insert_delay_script = true;
+								if ( array_key_exists( 'operation', $ele['args'] ) ) {
+									if ( 'user_interaction' === $ele['args']['operation'] ) {
+										// delay until user interaction
+										if ( 'script' === $tag_type ) {
+											$tag_contents = str_replace( 'src=', 'data-type="lazy" data-src=', $tag_contents );
+											$insert_delay_script = true;
+										}
+									} elseif ( 'page_loaded' === $ele['args']['operation'] ) {
+										// delay until page loaded
+										if ( 'script' === $tag_type ) {
+											$delay_timeout = 0;
+											if ( array_key_exists( 'delay', $ele['args'] ) && is_numeric( $ele['args']['delay'] ) ) {
+												$delay_timeout = intval( sanitize_text_field( $ele['args']['delay'] ) );
+											}
+
+											if ( 'code' === $ele['match'] ) {
+												$code_replacement = 'document.addEventListener(\'DOMContentLoaded\', () => { setTimeout(function () { ${2} }, ' . $delay_timeout . '); });';
+												$tag_contents = preg_replace( '/(<script[^>]*?[^>]*?>)([\s\S]*?)(<\/[^>]*script[^>]*?>)/im', '${1}' . $code_replacement . '${3}', $tag_contents );
+											}
+										}
 									}
 								}
 							}
