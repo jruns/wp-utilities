@@ -143,27 +143,8 @@ class Wp_Utilities_Html_Buffer {
 		// Add user interaction delay script if needed
 		if ( $insert_delay_script ) {
 			$autoLoadTimeout = 15000;
-			$delay_script = '<script defer>
-{
-	const wputilEventList = ["mouseover","keydown","touchmove","touchstart"];
-    const wputilLoad = () => {
-		const event = new Event("DOMUserInteraction");
-		document.dispatchEvent(event);
-
-		console.log(\'interacted\');
-
-		document.querySelectorAll("script[data-type=\'lazy\']").forEach(el => el.src = el.dataset.src);
-
-		wputilEventList.forEach(e => window.removeEventListener(e, wputilTrigger, {passive: true, once: true}));
-	}
-    const wputilTimer = setTimeout(wputilLoad, ' . $autoLoadTimeout . ');
-    const wputilTrigger = () => {
-        wputilLoad();
-        clearTimeout(wputilTimer);
-    };
-    wputilEventList.forEach(e => window.addEventListener(e, wputilTrigger, {passive: true, once: true}));
-}
-</script>';
+			$delay_script = '<script>const wputilAutoLoadTimeout = ' . $autoLoadTimeout . ';</script>\n' . 
+				'<script defer>{const e=wputilAutoLoadTimeout??15e3,t=["mouseover","keydown","touchmove","touchstart"],o=()=>{const e=new Event("DOMUserInteraction");document.dispatchEvent(e),console.log("interacted"),document.querySelectorAll("script[data-type=lazy]").forEach((e=>e.src=e.dataset.src)),t.forEach((e=>window.removeEventListener(e,n,{passive:!0,once:!0})))},c=setTimeout(o,e),n=()=>{o(),clearTimeout(c)};t.forEach((e=>window.addEventListener(e,n,{passive:!0,once:!0})))}</script>';
 
 			$buffer = str_replace( '</body>', $delay_script . '</body>', $buffer );
 		}
