@@ -1,5 +1,5 @@
 {
-    const autoloadTimeout = wputilAutoLoadTimeout ?? 15000;
+    const autoLoadDelay = wputilAutoLoadDelay;
 	const eventList = ["mouseover","keydown","touchmove","touchstart"];
     const load = () => {
 		const event = new Event("DOMUserInteraction");
@@ -11,7 +11,7 @@
 
 		eventList.forEach(e => window.removeEventListener(e, trigger, {passive: true, once: true}));
 	}
-    const timer = setTimeout(load, autoloadTimeout);
+    const timer = setTimeout(load, autoloadDelay);
     const trigger = () => {
         load();
         clearTimeout(timer);
