@@ -84,10 +84,18 @@ class Wp_Utilities_Delay_Scripts {
 	 * @since    0.4.0
 	 */
 	public static function get_user_interaction_delay_script() {
-		$autoLoadTimeout = 15000;
+		$delay_var = 'wp_utilities_delay_scripts_autoload_delay';
+		$delay_constant = strtoupper( $delay_var );
 
-		return '<script>const wputilAutoLoadTimeout = ' . $autoLoadTimeout . ';</script>' . PHP_EOL . 
-			'<script defer>{const e=wputilAutoLoadTimeout??15e3,t=["mouseover","keydown","touchmove","touchstart"],o=()=>{const e=new Event("DOMUserInteraction");document.dispatchEvent(e),console.log("interacted"),document.querySelectorAll("script[data-type=lazy]").forEach((e=>e.src=e.dataset.src)),t.forEach((e=>window.removeEventListener(e,n,{passive:!0,once:!0})))},c=setTimeout(o,e),n=()=>{o(),clearTimeout(c)};t.forEach((e=>window.addEventListener(e,n,{passive:!0,once:!0})))}</script>';
+		if ( defined( $delay_constant ) && is_numeric( constant( $delay_constant ) ) ) {
+			$autoLoadDelay = intval( constant( $delay_constant ) );
+		} else {
+			// get option, default to 15000 milliseconds if not set
+			$autoLoadDelay = get_option( $delay_var, 15000 );
+		}
+
+		return '<script>const wputilAutoLoadDelay = ' . $autoLoadDelay . ';</script>' . PHP_EOL . 
+			'<script defer>{wputilAutoLoadDelay;const e=["mouseover","keydown","touchmove","touchstart"],t=()=>{const t=new Event("DOMUserInteraction");document.dispatchEvent(t),console.log("interacted"),document.querySelectorAll("script[data-type=lazy]").forEach((e=>e.src=e.dataset.src)),e.forEach((e=>window.removeEventListener(e,a,{passive:!0,once:!0})))},o=setTimeout(t,autoloadTimeout),a=()=>{t(),clearTimeout(o)};e.forEach((e=>window.addEventListener(e,a,{passive:!0,once:!0})))}</script>';
 	}
 
 	/**
