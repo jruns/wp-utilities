@@ -11,7 +11,7 @@
 
 		eventList.forEach(e => window.removeEventListener(e, trigger, {passive: true, once: true}));
 	}
-    const timer = setTimeout(load, autoloadDelay);
+    const timer = setTimeout(load, autoLoadDelay);
     const trigger = () => {
         load();
         clearTimeout(timer);
