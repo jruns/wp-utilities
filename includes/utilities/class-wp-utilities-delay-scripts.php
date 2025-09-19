@@ -91,7 +91,10 @@ class Wp_Utilities_Delay_Scripts {
 			$autoLoadDelay = intval( constant( $delay_constant ) );
 		} else {
 			// get option, default to 15000 milliseconds if not set
-			$autoLoadDelay = get_option( $delay_var, 15000 );
+			$autoLoadDelay = get_option( $delay_var );
+			if ( empty( $autoLoadDelay ) ) {
+				$autoLoadDelay = 15000;
+			}
 		}
 
 		return '<script>const wputilAutoLoadDelay = ' . $autoLoadDelay . ';</script>' . PHP_EOL . 
