@@ -145,19 +145,23 @@ class Wp_Utilities_Html_Buffer {
 			$autoLoadTimeout = 15000;
 			$delay_script = '<script defer>
 {
-    const load = () => {
+	const wputilEventList = ["mouseover","keydown","touchmove","touchstart"];
+    const wputilLoad = () => {
 		const event = new Event("DOMUserInteraction");
-		console.log("interaction");
 		document.dispatchEvent(event);
 
+		console.log(\'interacted\');
+
 		document.querySelectorAll("script[data-type=\'lazy\']").forEach(el => el.src = el.dataset.src);
+
+		wputilEventList.forEach(e => window.removeEventListener(e, wputilTrigger, {passive: true, once: true}));
 	}
-    const timer = setTimeout(load, ' . $autoLoadTimeout . ');
-    const trigger = () => {
-        load();
-        clearTimeout(timer);
+    const wputilTimer = setTimeout(wputilLoad, ' . $autoLoadTimeout . ');
+    const wputilTrigger = () => {
+        wputilLoad();
+        clearTimeout(wputilTimer);
     };
-    ["mouseover","keydown","touchmove","touchstart"].forEach(e => window.addEventListener(e, trigger, {passive: true, once: true}));
+    wputilEventList.forEach(e => window.addEventListener(e, wputilTrigger, {passive: true, once: true}));
 }
 </script>';
 
