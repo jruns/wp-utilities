@@ -43,12 +43,6 @@ class Wp_Utilities_Html_Buffer {
 		$moves_queue = array();
 		$insert_delay_script = false;
 
-		if ( ! empty( $exclusions ) ) {
-			$exclusions = join( '|', $exclusions );
-		} else {
-			$exclusions = null;
-		}
-
 		foreach ( $match_settings as $ele ) {
 			// skip element if it is missing required keys or has unallowed values
 			if ( ! array_key_exists( 'match', $ele ) || ! array_key_exists( 'find', $ele ) || ! in_array( $ele['match'], $match_types ) ) {
@@ -79,7 +73,7 @@ class Wp_Utilities_Html_Buffer {
 
 			$buffer = preg_replace_callback( 
 				$regex_string, 
-				function( $matches ) use( $operation, $tag_type, $search_string, $ele, $exclusions, &$moves_queue, &$insert_delay_script )  {
+				function( $matches ) use( $operation, $tag_type, $search_string, $ele, &$moves_queue, &$insert_delay_script )  {
 					$tag_contents = $matches[0];
 
 					if ( 'code' === $ele['match'] ) {
@@ -90,36 +84,12 @@ class Wp_Utilities_Html_Buffer {
 					}
 
 					if ( $operation === 'delay' ) {
-						if ( empty( $exclusions ) || 1 !== preg_match( '/<script[^>]*' . $exclusions . '[^>]*>/im', $tag_contents ) ) {
-							if ( 0 === preg_match( '/<script[^>]* defer[^>]*>/im', $tag_contents ) ) {
-								$tag_contents = str_replace( '<script', '<script defer', $tag_contents );
-							}
-
-							if ( array_key_exists( 'args', $ele ) && ! empty( $ele['args'] ) ) {
-								if ( array_key_exists( 'operation', $ele['args'] ) ) {
-									if ( 'user_interaction' === $ele['args']['operation'] ) {
-										// delay until user interaction
-										if ( 'script' === $tag_type ) {
-											$tag_contents = str_replace( 'src=', 'data-type="lazy" data-src=', $tag_contents );
-											$insert_delay_script = true;
-										}
-									} elseif ( 'page_loaded' === $ele['args']['operation'] ) {
-										// delay until page loaded
-										if ( 'script' === $tag_type ) {
-											$delay_timeout = 0;
-											if ( array_key_exists( 'delay', $ele['args'] ) && is_numeric( $ele['args']['delay'] ) ) {
-												$delay_timeout = intval( sanitize_text_field( $ele['args']['delay'] ) );
-											}
-
-											if ( 'code' === $ele['match'] ) {
-												$code_replacement = 'document.addEventListener(\'DOMContentLoaded\', () => { setTimeout(function () { ${2} }, ' . $delay_timeout . '); });';
-												$tag_contents = preg_replace( '/(<script[^>]*?[^>]*?>)([\s\S]*?)(<\/[^>]*script[^>]*?>)/im', '${1}' . $code_replacement . '${3}', $tag_contents );
-											}
-										}
-									}
-								}
-							}
-						}
+						$delay_args = array(
+							'tag_type'		=> $tag_type,
+							'tag_contents'	=> $tag_contents,
+							'ele'			=> $ele
+						);
+						$tag_contents = Wp_Utilities_Delay_Scripts::process_tag( $delay_args, $insert_delay_script );
 					} else {
 						if ( $operation === 'move_to_footer' ) {
 							$moves_queue[] = $tag_contents;
@@ -142,11 +112,9 @@ class Wp_Utilities_Html_Buffer {
 
 		// Add user interaction delay script if needed
 		if ( $insert_delay_script ) {
-			$autoLoadTimeout = 15000;
-			$delay_script = '<script>const wputilAutoLoadTimeout = ' . $autoLoadTimeout . ';</script>\n' . 
-				'<script defer>{const e=wputilAutoLoadTimeout??15e3,t=["mouseover","keydown","touchmove","touchstart"],o=()=>{const e=new Event("DOMUserInteraction");document.dispatchEvent(e),console.log("interacted"),document.querySelectorAll("script[data-type=lazy]").forEach((e=>e.src=e.dataset.src)),t.forEach((e=>window.removeEventListener(e,n,{passive:!0,once:!0})))},c=setTimeout(o,e),n=()=>{o(),clearTimeout(c)};t.forEach((e=>window.addEventListener(e,n,{passive:!0,once:!0})))}</script>';
+			$delay_script = Wp_Utilities_Delay_Scripts::get_user_interaction_delay_script();
 
-			$buffer = str_replace( '</body>', $delay_script . '</body>', $buffer );
+			$buffer = str_replace( '</body>', $delay_script . PHP_EOL .'</body>', $buffer );
 		}
 
 		return $buffer;

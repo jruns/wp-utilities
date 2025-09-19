@@ -27,14 +27,67 @@ class Wp_Utilities_Delay_Scripts {
 				'tag_type'			=> 'script',
 				'match_settings'	=> $this->settings['scripts'],
 				'match_types'		=> array( 'id', 'src', 'code' ),
-				'operation'			=> 'delay',
-				'exclusions'		=> self::EXCLUSIONS
+				'operation'			=> 'delay'
 			);
 
 			$buffer = Wp_Utilities_Html_Buffer::process_buffer_replacements( $buffer, $match_args );
 		}
 
 		return $buffer;
+	}
+
+	/**
+	 * Process tag replacements for HTML Buffer class
+	 *
+	 * @since    0.4.0
+	 */
+	public static function process_tag( $args, &$insert_delay_script ) {
+		extract( $args );
+
+		if ( empty( self::EXCLUSIONS ) || 1 !== preg_match( '/<script[^>]*' . join( '|', self::EXCLUSIONS ) . '[^>]*>/im', $tag_contents ) ) {
+			if ( 0 === preg_match( '/<script[^>]* defer[^>]*>/im', $tag_contents ) ) {
+				$tag_contents = str_replace( '<script', '<script defer', $tag_contents );
+			}
+
+			if ( array_key_exists( 'args', $ele ) && ! empty( $ele['args'] ) ) {
+				if ( array_key_exists( 'operation', $ele['args'] ) ) {
+					if ( 'user_interaction' === $ele['args']['operation'] ) {
+						// delay until user interaction
+						if ( 'script' === $tag_type ) {
+							$tag_contents = str_replace( 'src=', 'data-type="lazy" data-src=', $tag_contents );
+							$insert_delay_script = true;
+						}
+					} elseif ( 'page_loaded' === $ele['args']['operation'] ) {
+						// delay until page loaded
+						if ( 'script' === $tag_type ) {
+							$delay_timeout = 0;
+							if ( array_key_exists( 'delay', $ele['args'] ) && is_numeric( $ele['args']['delay'] ) ) {
+								$delay_timeout = intval( sanitize_text_field( $ele['args']['delay'] ) );
+							}
+
+							if ( 'code' === $ele['match'] ) {
+								$code_replacement = 'document.addEventListener(\'DOMContentLoaded\', () => { setTimeout(function () { ${2} }, ' . $delay_timeout . '); });';
+								$tag_contents = preg_replace( '/(<script[^>]*?[^>]*?>)([\s\S]*?)(<\/[^>]*script[^>]*?>)/im', '${1}' . $code_replacement . '${3}', $tag_contents );
+							}
+						}
+					}
+				}
+			}
+		}
+
+		return $tag_contents;
+	}
+
+	/**
+	 * Return the user interaction delay script
+	 *
+	 * @since    0.4.0
+	 */
+	public static function get_user_interaction_delay_script() {
+		$autoLoadTimeout = 15000;
+
+		return '<script>const wputilAutoLoadTimeout = ' . $autoLoadTimeout . ';</script>' . PHP_EOL . 
+			'<script defer>{const e=wputilAutoLoadTimeout??15e3,t=["mouseover","keydown","touchmove","touchstart"],o=()=>{const e=new Event("DOMUserInteraction");document.dispatchEvent(e),console.log("interacted"),document.querySelectorAll("script[data-type=lazy]").forEach((e=>e.src=e.dataset.src)),t.forEach((e=>window.removeEventListener(e,n,{passive:!0,once:!0})))},c=setTimeout(o,e),n=()=>{o(),clearTimeout(c)};t.forEach((e=>window.addEventListener(e,n,{passive:!0,once:!0})))}</script>';
 	}
 
 	/**
