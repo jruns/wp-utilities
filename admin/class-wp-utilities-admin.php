@@ -62,6 +62,11 @@ class Wp_Utilities_Admin {
 	
     public function registersettings() {
         register_setting( 'wp-utilities', 'wp_utilities_disable_jquery_migrate');
+        register_setting( 'wp-utilities', 'wp_utilities_move_scripts_and_styles_to_footer');
+        register_setting( 'wp-utilities', 'wp_utilities_remove_scripts_and_styles');
+        register_setting( 'wp-utilities', 'wp_utilities_delay_scripts');
+        register_setting( 'wp-utilities', 'wp_utilities_delay_scripts_autoload_delay');
+        register_setting( 'wp-utilities', 'wp_utilities_enable_youtube_facade');
     }
 
 	public function render_options_page() {
