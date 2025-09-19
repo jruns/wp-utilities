@@ -95,7 +95,7 @@ class Wp_Utilities_Delay_Scripts {
 		}
 
 		return '<script>const wputilAutoLoadDelay = ' . $autoLoadDelay . ';</script>' . PHP_EOL . 
-			'<script defer>{wputilAutoLoadDelay;const e=["mouseover","keydown","touchmove","touchstart"],t=()=>{const t=new Event("DOMUserInteraction");document.dispatchEvent(t),console.log("interacted"),document.querySelectorAll("script[data-type=lazy]").forEach((e=>e.src=e.dataset.src)),e.forEach((e=>window.removeEventListener(e,a,{passive:!0,once:!0})))},o=setTimeout(t,autoloadTimeout),a=()=>{t(),clearTimeout(o)};e.forEach((e=>window.addEventListener(e,a,{passive:!0,once:!0})))}</script>';
+			'<script defer>{wputilAutoLoadDelay;const e=["mouseover","keydown","touchmove","touchstart"],t=()=>{const t=new Event("DOMUserInteraction");document.dispatchEvent(t),console.log("interacted"),document.querySelectorAll("script[data-type=lazy]").forEach((e=>e.src=e.dataset.src)),e.forEach((e=>window.removeEventListener(e,a,{passive:!0,once:!0})))},o=setTimeout(t,autoloadDelay),a=()=>{t(),clearTimeout(o)};e.forEach((e=>window.addEventListener(e,a,{passive:!0,once:!0})))}</script>';
 	}
 
 	/**
