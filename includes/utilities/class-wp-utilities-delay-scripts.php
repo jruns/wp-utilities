@@ -51,12 +51,14 @@ class Wp_Utilities_Delay_Scripts {
 
 			if ( array_key_exists( 'args', $ele ) && ! empty( $ele['args'] ) ) {
 				if ( array_key_exists( 'operation', $ele['args'] ) ) {
+					$is_external_script = ( 1 === preg_match( '/<script[^>]*?src=[\\\'\"][^\\\'\"]*[\\\'\"][^>]*?>/im', $tag_contents ) );
+
 					if ( 'user_interaction' === $ele['args']['operation'] ) {
 						// delay until user interaction
 						if ( 'script' === $tag_type ) {
 							$insert_delay_scripts['user_interaction'] = true;
 
-							if ( 1 === preg_match( '/<script[^>]*?src=[\\\'\"][^\\\'\"]*[\\\'\"][^>]*?>/im', $tag_contents ) ) {
+							if ( $is_external_script ) {
 								$tag_contents = str_replace( 'src=', 'data-type="user_interaction_delay" data-src=', $tag_contents );
 							} else {
 								$code_replacement = 'document.addEventListener(\'DOMUserInteraction\', () => { ${2} });';
@@ -71,7 +73,7 @@ class Wp_Utilities_Delay_Scripts {
 								$delay_timeout = intval( sanitize_text_field( $ele['args']['delay'] ) );
 							}
 
-							if ( 1 === preg_match( '/<script[^>]*?src=[\\\'\"][^\\\'\"]*[\\\'\"][^>]*?>/im', $tag_contents ) ) {
+							if ( $is_external_script ) {
 								$tag_contents = str_replace( 'src=', 'data-type="page_loaded_delay" data-delay="' . $delay_timeout . '" data-src=', $tag_contents );
 								$insert_delay_scripts['page_loaded'] = true;
 							} else {
