@@ -41,7 +41,7 @@ class Wp_Utilities_Html_Buffer {
 		extract( $args );
 
 		$moves_queue = array();
-		$insert_delay_script = false;
+		$insert_delay_scripts = array();
 
 		foreach ( $match_settings as $ele ) {
 			// skip element if it is missing required keys or has unallowed values
@@ -73,7 +73,7 @@ class Wp_Utilities_Html_Buffer {
 
 			$buffer = preg_replace_callback( 
 				$regex_string, 
-				function( $matches ) use( $operation, $tag_type, $search_string, $ele, &$moves_queue, &$insert_delay_script )  {
+				function( $matches ) use( $operation, $tag_type, $search_string, $ele, &$insert_delay_scripts )  {
 					$tag_contents = $matches[0];
 
 					if ( 'code' === $ele['match'] ) {
@@ -89,7 +89,7 @@ class Wp_Utilities_Html_Buffer {
 							'tag_contents'	=> $tag_contents,
 							'ele'			=> $ele
 						);
-						$tag_contents = Wp_Utilities_Delay_Scripts::process_tag( $delay_args, $insert_delay_script );
+						$tag_contents = Wp_Utilities_Delay_Scripts::process_tag( $delay_args, $insert_delay_scripts );
 					} else {
 						if ( $operation === 'move_to_footer' ) {
 							$moves_queue[] = $tag_contents;
@@ -110,11 +110,11 @@ class Wp_Utilities_Html_Buffer {
 			$buffer = str_replace( '</body>', $tag_to_move . '</body>', $buffer );
 		}
 
-		// Add user interaction delay script if needed
-		if ( $insert_delay_script ) {
-			$delay_script = Wp_Utilities_Delay_Scripts::get_user_interaction_delay_script();
+		// Add delay scripts if needed
+		if ( ! empty( $insert_delay_scripts ) ) {
+			$delay_scripts = Wp_Utilities_Delay_Scripts::get_delay_scripts( $insert_delay_scripts );
 
-			$buffer = str_replace( '</body>', $delay_script . PHP_EOL .'</body>', $buffer );
+			$buffer = str_replace( '</body>', $delay_scripts . '</body>', $buffer );
 		}
 
 		return $buffer;
