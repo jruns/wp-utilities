@@ -73,7 +73,7 @@ Add individual configurations by adding a new array to the `scripts` key in the 
 | where     | Optional | String or Array. Available options: `all` for matching all posts/pages, select WP conditionals, and `path_` or `not_path_` for matching url path. Defaults to `all` if `where` is not specified. Arrays allow you to combine multiple conditions with an AND-like search (only pages containing all conditions will be matched).<br/><br/>Available WP conditionals: is_home, is_front_page, is_single, is_page, is_author, is_archive, has_excerpt, is_search, is_404, is_paged, is_attachment, is_singular, is_user_logged_in, not_is_home, not_is_front_page, not_is_single, not_is_page, not_is_author, not_is_archive, not_has_excerpt, not_is_search, not_is_404, not_is_paged, not_is_attachment, not_is_singular, not_is_user_logged_in |
 | args      | Optional | Array. Available keys: `operation` and `delay`. `delay` must be in milliseconds.<br/>Available operations: `page_loaded` and `user_interaction` |
 
-### How to use the new DOMUserInteraction event:
+#### How to use the new DOMUserInteraction event:
 You must first have at least one script being delayed on a specified page with the `wp_utilities_scripts_to_delay` filter. Then the new event will be available on that page.  
 ```php
 document.addEventListener( "DOMUserInteraction", () => {
