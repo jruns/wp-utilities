@@ -63,8 +63,8 @@ add_filter( 'wp_utilities_scripts_to_delay', 'delay_scripts', 10, 1 );
 ```
 
 #### Filter settings options:
-Add individual delay configurations by adding them to the `scripts` array in the variable passed to your function by the filter.  
-| Array Key   |     | Allowed Values |
+Add individual delay configurations by adding a new array to the `scripts` array in the variable passed to your function by the filter.  
+| Key   |     | Allowed Values |
 | ----------- | --- | -------------- |
 | match     | Required | String. `id`, `src`, `code` |
 | find      | Required | String or Array. Text to search within the `match` attribute/section. |
