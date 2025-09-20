@@ -54,8 +54,14 @@ class Wp_Utilities_Delay_Scripts {
 					if ( 'user_interaction' === $ele['args']['operation'] ) {
 						// delay until user interaction
 						if ( 'script' === $tag_type ) {
-							$tag_contents = str_replace( 'src=', 'data-type="user_interaction_delay" data-src=', $tag_contents );
 							$insert_delay_scripts['user_interaction'] = true;
+
+							if ( 1 === preg_match( '/<script[^>]*?src=[\\\'\"][^\\\'\"]*[\\\'\"][^>]*?>/im', $tag_contents ) ) {
+								$tag_contents = str_replace( 'src=', 'data-type="user_interaction_delay" data-src=', $tag_contents );
+							} else {
+								$code_replacement = 'document.addEventListener(\'DOMUserInteraction\', () => { ${2} });';
+								$tag_contents = preg_replace( '/(<script[^>]*?[^>]*?>)([\s\S]*?)(<\/[^>]*script[^>]*?>)/im', '${1}' . $code_replacement . '${3}', $tag_contents );
+							}
 						}
 					} elseif ( 'page_loaded' === $ele['args']['operation'] ) {
 						// delay until page loaded
