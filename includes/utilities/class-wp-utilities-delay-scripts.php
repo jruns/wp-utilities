@@ -41,7 +41,7 @@ class Wp_Utilities_Delay_Scripts {
 	 *
 	 * @since    0.4.0
 	 */
-	public static function process_tag( $args, &$insert_delay_script ) {
+	public static function process_tag( $args, &$insert_delay_scripts ) {
 		extract( $args );
 
 		if ( empty( self::EXCLUSIONS ) || 1 !== preg_match( '/<script[^>]*' . join( '|', self::EXCLUSIONS ) . '[^>]*>/im', $tag_contents ) ) {
@@ -55,7 +55,7 @@ class Wp_Utilities_Delay_Scripts {
 						// delay until user interaction
 						if ( 'script' === $tag_type ) {
 							$tag_contents = str_replace( 'src=', 'data-type="lazy" data-src=', $tag_contents );
-							$insert_delay_script = true;
+							$insert_delay_scripts['user_interaction'] = true;
 						}
 					} elseif ( 'page_loaded' === $ele['args']['operation'] ) {
 						// delay until page loaded
@@ -65,7 +65,10 @@ class Wp_Utilities_Delay_Scripts {
 								$delay_timeout = intval( sanitize_text_field( $ele['args']['delay'] ) );
 							}
 
-							if ( 'code' === $ele['match'] ) {
+							if ( 1 === preg_match( '/<script[^>]*?src=[\\\'\"][^\\\'\"]*[\\\'\"][^>]*?>/im', $tag_contents ) ) {
+								$tag_contents = str_replace( 'src=', 'data-type="page_loaded_delay" data-delay="' . $delay_timeout . '" data-src=', $tag_contents );
+								$insert_delay_scripts['page_loaded'] = true;
+							} else {
 								$code_replacement = 'document.addEventListener(\'DOMContentLoaded\', () => { setTimeout(function () { ${2} }, ' . $delay_timeout . '); });';
 								$tag_contents = preg_replace( '/(<script[^>]*?[^>]*?>)([\s\S]*?)(<\/[^>]*script[^>]*?>)/im', '${1}' . $code_replacement . '${3}', $tag_contents );
 							}
@@ -76,6 +79,25 @@ class Wp_Utilities_Delay_Scripts {
 		}
 
 		return $tag_contents;
+	}
+
+	/**
+	 * Return the necessary delay scripts
+	 *
+	 * @since    0.4.0
+	 */
+	public static function get_delay_scripts( $args ) {
+		$output = '';
+
+		if ( array_key_exists( 'user_interaction', $args ) && $args['user_interaction'] ) {
+			$output .= self::get_user_interaction_delay_script() . PHP_EOL;
+		}
+
+		if ( array_key_exists( 'page_loaded', $args ) && $args['page_loaded'] ) {
+			$output .= self::get_page_loaded_delay_script() . PHP_EOL;
+		}
+
+		return $output;
 	}
 
 	/**
@@ -99,6 +121,15 @@ class Wp_Utilities_Delay_Scripts {
 
 		return '<script>const wputilAutoLoadDelay = ' . $autoLoadDelay . ';</script>' . PHP_EOL . 
 			'<script defer>{const e=wputilAutoLoadDelay,t=["mouseover","keydown","touchmove","touchstart"],o=()=>{const e=new Event("DOMUserInteraction");document.dispatchEvent(e),console.log("interacted"),document.querySelectorAll("script[data-type=lazy]").forEach((e=>e.src=e.dataset.src)),t.forEach((e=>window.removeEventListener(e,n,{passive:!0,once:!0})))},c=setTimeout(o,e),n=()=>{o(),clearTimeout(c)};t.forEach((e=>window.addEventListener(e,n,{passive:!0,once:!0})))}</script>';
+	}
+
+	/**
+	 * Return the page loaded delay script
+	 *
+	 * @since    0.4.0
+	 */
+	public static function get_page_loaded_delay_script() {
+		return '<script defer>document.addEventListener("DOMContentLoaded",(()=>{document.querySelectorAll("script[data-type=page_loaded_delay]").forEach((e=>{setTimeout((function(){e.src=e.dataset.src}),e.dataset.delay)}))}));</script>';
 	}
 
 	/**
