@@ -62,7 +62,8 @@ function delay_scripts( $settings ) {
 add_filter( 'wp_utilities_scripts_to_delay', 'delay_scripts', 10, 1 );
 ```
 
-Filter settings options:
+#### Filter settings options:
+Add individual delay configurations by adding them to the `scripts` array in the variable passed to your function by the filter.  
 | Array Key | Allowed Values |
 | --------- | -------------- |
 | match     | Required. `id`, `src`, `code` |
