@@ -7,7 +7,7 @@
 
 		console.log("interacted");
 
-		document.querySelectorAll("script[data-type=lazy]").forEach(el => el.src = el.dataset.src);
+		document.querySelectorAll("script[data-type=user_interaction_delay]").forEach(el => el.src = el.dataset.src);
 
 		eventList.forEach(e => window.removeEventListener(e, trigger, {passive: true, once: true}));
 	}

@@ -54,7 +54,7 @@ class Wp_Utilities_Delay_Scripts {
 					if ( 'user_interaction' === $ele['args']['operation'] ) {
 						// delay until user interaction
 						if ( 'script' === $tag_type ) {
-							$tag_contents = str_replace( 'src=', 'data-type="lazy" data-src=', $tag_contents );
+							$tag_contents = str_replace( 'src=', 'data-type="user_interaction_delay" data-src=', $tag_contents );
 							$insert_delay_scripts['user_interaction'] = true;
 						}
 					} elseif ( 'page_loaded' === $ele['args']['operation'] ) {
@@ -120,7 +120,7 @@ class Wp_Utilities_Delay_Scripts {
 		}
 
 		return '<script>const wputilAutoLoadDelay = ' . $autoLoadDelay . ';</script>' . PHP_EOL . 
-			'<script defer>{const e=wputilAutoLoadDelay,t=["mouseover","keydown","touchmove","touchstart"],o=()=>{const e=new Event("DOMUserInteraction");document.dispatchEvent(e),console.log("interacted"),document.querySelectorAll("script[data-type=lazy]").forEach((e=>e.src=e.dataset.src)),t.forEach((e=>window.removeEventListener(e,n,{passive:!0,once:!0})))},c=setTimeout(o,e),n=()=>{o(),clearTimeout(c)};t.forEach((e=>window.addEventListener(e,n,{passive:!0,once:!0})))}</script>';
+			'<script defer>{const e=wputilAutoLoadDelay,t=["mouseover","keydown","touchmove","touchstart"],o=()=>{const e=new Event("DOMUserInteraction");document.dispatchEvent(e),console.log("interacted"),document.querySelectorAll("script[data-type=user_interaction_delay]").forEach((e=>e.src=e.dataset.src)),t.forEach((e=>window.removeEventListener(e,c,{passive:!0,once:!0})))},n=setTimeout(o,e),c=()=>{o(),clearTimeout(n)};t.forEach((e=>window.addEventListener(e,c,{passive:!0,once:!0})))}</script>';
 	}
 
 	/**
