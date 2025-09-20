@@ -40,56 +40,81 @@ class Wp_Utilities_Html_Buffer {
 	public static function process_buffer_replacements( $buffer, $args ) {
 		extract( $args );
 
-		$match_strings = array();
-		// Expand match strings into an OR statement
-		foreach ( $match_types as $type ) {
-			$match_array = array_map( 
-				function( $value ) { 
-					return is_array( $value ) ? join( "|", $value ) : $value; 
-				},
-				array_column( $match_settings, $type ) 
-			);
-			$match_strings[ $type ] = addcslashes( join( "|", $match_array ), '/' );
-		}
-
 		$moves_queue = array();
+		$insert_delay_scripts = array();
 
-		$buffer = preg_replace_callback( 
-			$tag_regex, 
-			function( $matches ) use( $operation, $match_settings, $match_types, $match_strings, &$moves_queue )  {
-				foreach ( $match_types as $type ) {
-					switch( $type ) {
-						case 'id':
-						case 'src':
-						case 'href':
-							if ( ! empty( $match_strings[ $type ] ) && preg_match( '/' . $type . '=[\\\'\"][^\\\'\"]*(' . $match_strings[ $type ] . ')[^\\\'\"]*[\\\'\"]/i', $matches[0] ) ) {
-								if ( $operation === 'move_to_footer' ) {
-									$moves_queue[] = $matches[0];
-								}
-								return '';
-							}
-							break;
-						case 'code':
-							if ( ! empty( $match_strings[ $type ] ) && preg_match( '/(' . $match_strings[ $type ] . ')/im', $matches[0] ) ) {
-								if ( $operation === 'move_to_footer' ) {
-									$moves_queue[] = $matches[0];
-								}
-								return '';
-							}
-							break;
-						default:
-							break;
-					}
+		foreach ( $match_settings as $ele ) {
+			// skip element if it is missing required keys or has unallowed values
+			if ( ! array_key_exists( 'match', $ele ) || ! array_key_exists( 'find', $ele ) || ! in_array( $ele['match'], $match_types ) ) {
+				continue;
+			}
+
+			// Turn array search options into an OR string
+			if ( is_array( $ele['find'] ) ) {
+				$ele['find'] = join( "|", $ele['find'] );
+			}
+			$search_string = addcslashes( $ele['find'], '/()[]{}.,+*^$' );
+
+			if ( 'code' === $ele['match'] ) {
+				if ( 'script' === $tag_type ) {
+					$regex_string = '/<script[^>]*?>(?!<\/[^>]*script[^>]*?)[\s\S]+?<\/[^>]*script[^>]*?>\n?/im';
+				} else {
+					$regex_string = '/<style[^>]*?>(?!<\/[^>]*script[^>]*?)[\s\S]+?<\/[^>]*style[^>]*?>\n?/im';
 				}
+			} else {
+				$regex_base = $ele['match'] . '=[\\\'\"][^\\\'\"]*(' . $search_string . ')[^\\\'\"]*[\\\'\"]';
 				
-				return $matches[0];
-			},
-			$buffer
-		);
+				if ( 'script' === $tag_type ) {
+					$regex_string = '/<script[^>]*?' . $regex_base . '[^>]*?>[\s\S]*?<\/[^>]*script[^>]*>\n?/im';
+				} else {
+					$regex_string = '/<link[^>]*?' . $regex_base . '[^>]*?rel=[\\\'\"]stylesheet[\\\'\"][^>]*?>\n?|<link[^>]*?rel=[\\\'\"]stylesheet[\\\'\"][^>]*' . $regex_base . '[^>]*?>\n?|<style[^>]*?' . $regex_base . '[^>]*?>[\s\S]*?<\/[^>]*style[^>]*>\n?/im';
+				}
+			}
+
+			$buffer = preg_replace_callback( 
+				$regex_string, 
+				function( $matches ) use( $operation, $tag_type, $search_string, $ele, &$insert_delay_scripts )  {
+					$tag_contents = $matches[0];
+
+					if ( 'code' === $ele['match'] ) {
+						// Check if code section matches search settings. Skip tag if it doesn't.
+						if ( 0 === preg_match( '/(' . $search_string . ')/im', $tag_contents ) ) {
+							return $tag_contents;
+						}
+					}
+
+					if ( $operation === 'delay' ) {
+						$delay_args = array(
+							'tag_type'		=> $tag_type,
+							'tag_contents'	=> $tag_contents,
+							'ele'			=> $ele
+						);
+						$tag_contents = Wp_Utilities_Delay_Scripts::process_tag( $delay_args, $insert_delay_scripts );
+					} else {
+						if ( $operation === 'move_to_footer' ) {
+							$moves_queue[] = $tag_contents;
+						}
+
+						// Remove existing tag
+						$tag_contents = '';
+					}
+					
+					return $tag_contents;
+				},
+				$buffer
+			);
+		}
 
 		// Add tags queued for movement to the footer.
 		foreach( $moves_queue as $tag_to_move ) {
 			$buffer = str_replace( '</body>', $tag_to_move . '</body>', $buffer );
+		}
+
+		// Add delay scripts if needed
+		if ( ! empty( $insert_delay_scripts ) ) {
+			$delay_scripts = Wp_Utilities_Delay_Scripts::get_delay_scripts( $insert_delay_scripts );
+
+			$buffer = str_replace( '</body>', $delay_scripts . '</body>', $buffer );
 		}
 
 		return $buffer;

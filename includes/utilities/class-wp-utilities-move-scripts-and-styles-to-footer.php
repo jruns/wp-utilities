@@ -24,7 +24,7 @@ class Wp_Utilities_Move_Scripts_And_Styles_To_Footer {
 		if ( ! empty( $this->settings['scripts'] ) ) {
 			// Process all script tags
 			$match_args = array(
-				'tag_regex'			=> '/<script[^>]*>[\s\S]*?<\/[^>]*script[^>]*>\n?/im',
+				'tag_type'			=> 'script',
 				'match_settings'	=> $this->settings['scripts'],
 				'match_types'		=> array( 'id', 'src', 'code' ),
 				'operation'			=> 'move_to_footer'
@@ -35,7 +35,7 @@ class Wp_Utilities_Move_Scripts_And_Styles_To_Footer {
 		if ( ! empty( $this->settings['styles'] ) ) {
 			// Process all stylesheet link and style tags
 			$match_args = array(
-				'tag_regex'			=> '/<link[^>]*rel=[\\\'\"]stylesheet[\\\'\"][^>]*>\n?|<style[^>]*>[\s\S]*?<\/[^>]*style[^>]*>\n?/im',
+				'tag_type'			=> 'style',
 				'match_settings'	=> $this->settings['styles'],
 				'match_types'		=> array( 'id', 'href', 'code' ),
 				'operation'			=> 'move_to_footer'

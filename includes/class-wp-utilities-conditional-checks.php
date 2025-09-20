@@ -27,15 +27,16 @@ class Wp_Utilities_Conditional_Checks {
 		$url_path = sanitize_title( str_replace( '/', '_', parse_url( $wp->request )['path'] ) );
 
 		return array_filter( $matches, function( $value ) use( $allowed_conditionals, $url_path ) {
-			if ( ! array_key_exists( 'match', $value ) ) {
+			// Default to match all posts/pages if 'where' key is not set
+			if ( ! array_key_exists( 'where', $value ) ) {
 				return true;
 			}
 
-			if ( is_string( $value['match'] ) ) {
-				$value['match'] = array( $value['match'] );
+			if ( is_string( $value['where'] ) ) {
+				$value['where'] = array( $value['where'] );
 			}
 
-			return array_reduce( $value['match'], function( $carry, $conditional ) use ( $allowed_conditionals, $url_path ) {
+			return array_reduce( $value['where'], function( $carry, $conditional ) use ( $allowed_conditionals, $url_path ) {
 				$negate = false;
 				if ( 0 === strpos( $conditional, 'not_' ) ) {
 					// negate conditional

@@ -1,0 +1,24 @@
+{
+	"name": "jruns/wp-utilities",
+	"description": "WordPress plugin to improve the performance of a WordPress website.",
+	"license": "GPL-2.0-or-later",
+	"type": "wordpress-plugin",
+	"keywords": [
+		"wordpress",
+		"performance",
+        "defer",
+        "delay"
+	],
+	"authors": [
+		{
+			"name": "Jason Schramm",
+			"email": "jason.runs@proton.me",
+			"homepage": "https://github.com/jruns"
+		}
+	],
+	"homepage": "https://github.com/jruns/wp-utilities",
+	"support": {
+		"issues": "https://github.com/jruns/wp-utilities/issues",
+		"source": "https://github.com/jruns/wp-utilities"
+	}
+}

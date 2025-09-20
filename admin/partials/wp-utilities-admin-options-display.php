@@ -12,16 +12,61 @@
  * @subpackage Wp_Utilities/admin/partials
  */
 ?>
-<style>
+<style>;
+    }
+    .form-table th, .form-table td {
+        padding: 0 10px 0 0;
+    }
     @media screen and (min-width: 783px) {
         .form-table th {
             width: 250px;
         }
     }
 
+    .child-table {
+        width: 100%;
+        margin-top: 10px;
+        margin-left: 40px;
+    }
+    .form-table .child-table th {
+        padding: 0;
+    }
+    .form-table .child-table td {
+        padding: 5px 0 10px;
+    }
+
     .utility_notice {
         font-size: 0.9em;
         color: #666;
+    }
+
+    .dashicons-warning {
+        line-height: 1.4;
+        font-size: 14px;
+        color: #F5B027;
+        margin-left:4px;
+    }
+
+    .tooltip {
+        position: relative;
+        display: inline-block;	
+    }
+    .tooltip .tooltip-text {
+        visibility: hidden;
+        top: 20px;
+        right: 0;
+        min-width:280px;
+        background-color: #E4E4E4;
+        border: 2px solid #3D3D3D;
+        border-radius: 5px;
+        font-size: 0.9em;
+        color: rgb(60, 67, 74);
+        padding: 4px;
+        position: absolute;
+        z-index: 1;
+    }
+    .tooltip:hover .tooltip-text {
+        visibility: visible;
     }
 </style>
 
@@ -59,6 +104,22 @@ $args = array(
 echo output_admin_option( $args );
 
 $args = array(
+    'utility_var'       => 'wp_utilities_delay_scripts',
+    'heading'           => 'Delay Scripts?',
+    'description'       => 'Enable the `wp_utilities_scripts_to_delay` WordPress filter to selectively delay scripts on the frontend.',
+    'child_options'     => array(
+        array(
+            'utility_var'       => 'wp_utilities_delay_scripts_autoload_delay',
+            'type'              => 'number',
+            'default'           => 15000,
+            'heading'           => 'User interaction autoload delay',
+            'description'       => 'Modify the autoload delay that will load a script when the user has not yet interacted with the page. Default is 15 seconds (in milliseconds).'
+        )
+    )
+);
+echo output_admin_option( $args );
+
+$args = array(
     'utility_var'       => 'wp_utilities_enable_youtube_facade',
     'heading'           => 'Enable YouTube Facade?',
     'description'       => 'Enable YouTube facade for videos on the frontend, and delay loading videos until the user clicks the placeholder image.'
@@ -83,19 +144,41 @@ function output_admin_option( $args ) {
     extract( $args );
 
     $utility_constant = strtoupper( $utility_var );
-    $utility_status = null;
+    $utility_value = null;
+    $placeholder = '';
     $after_label_msg = '';
     if( defined( $utility_constant ) ) {
-        $utility_status = constant( $utility_constant );
-        $after_label_msg = __( "<br/><br/><span class='utility_notice'>This setting is currently configured in your wp-config.php file and can only be edited there. Remove $utility_constant from wp-config.php in order to configure this setting here.</span>" );
+        $utility_value = constant( $utility_constant );
+        $after_label_msg = __( "<span class='tooltip'><span class='dashicons dashicons-warning'></span><span class='tooltip-text'>This setting is currently configured in your wp-config.php file and can only be enabled or disabled there.<br/><br/>Remove $utility_constant from wp-config.php in order to enable/disable this setting here.</span></span>" );
     } else {
-        $utility_status = get_option( $utility_var );
+        $utility_value = get_option( $utility_var );
+    }
+
+    $child_output = '';
+
+    if ( ! empty( $child_options ) && is_array( $child_options ) ) {
+        foreach( $child_options as $child ) {
+            $child['is_child'] = true;
+            $child_output .= output_admin_option( $child );
+        }
+        $child_output = "<table class='child-table'>" . $child_output . "</table>";
+    }
+
+    $input_output = "<input type='checkbox' id='$utility_var' name='$utility_var' value='1' " . ( $utility_value ? "checked='checked'" : '' ) . ( defined( $utility_constant ) ? ' disabled' : '' ) . "/>" . __( $description, 'wp-utilities' ) . "$after_label_msg";
+    if ( ! empty( $type ) ) {
+        if ( empty( $utility_value ) && ! empty( $default ) ) {
+            $placeholder = "placeholder='$default'";
+        }
+
+        if ( 'number' === $type ) {
+            $input_output = __( $description, 'wp-utilities' ) . "<br/><input type='number' id='$utility_var' name='$utility_var' value='$utility_value' $placeholder" . ( defined( $utility_constant ) ? ' disabled' : '' ) . "/>$after_label_msg";
+        }
     }
 
     return "<tr valign='top'>
-        <th scope='row'>" . __( $heading, 'wp-utilities' ) . "</th>
-        <td><label><input type='checkbox' id='$utility_var' name='$utility_var' value='1' " . ( $utility_status ? "checked='checked'" : '' ) . ( defined( $utility_constant ) ? ' disabled' : '' ) . "/> " .
-        __( $description, 'wp-utilities' ) . "</label>
-        $after_label_msg
+        <th scope='row'>" . __( $heading, 'wp-utilities' ) . "</th>" .
+        ( ! empty( $is_child ) && $is_child ? "</tr><tr valign='top'>" : "" ) .
+        "<td><label>$input_output</label>
+        $child_output
         </td></tr>";
 }
