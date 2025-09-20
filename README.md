@@ -64,13 +64,13 @@ function delay_scripts( $settings ) {
 add_filter( 'wp_utilities_scripts_to_delay', 'delay_scripts', 10, 1 );
 ```
 
-#### Filter settings options:
-Add individual delay configurations by adding a new array to the `scripts` array in the variable passed to your function by the filter.  
+#### Filter settings options for script tags:
+Add individual configurations by adding a new array to the `scripts` key in the variable passed to your function by the filter.  
 | Key   |     | Allowed Values |
 | ----------- | --- | -------------- |
 | match     | Required | String. `id`, `src`, `code` |
-| find      | Required | String or Array. Text to search within the `match` attribute/section. |
-| where     | Optional | String. Available options: `all` for matching all posts/pages, select WP conditionals, and `path_` or `not_path_` for matching url path. Defaults to `all` if `where` is not specified.<br/><br/>Available WP conditionals: is_home, is_front_page, is_single, is_page, is_author, is_archive, has_excerpt, is_search, is_404, is_paged, is_attachment, is_singular, is_user_logged_in, not_is_home, not_is_front_page, not_is_single, not_is_page, not_is_author, not_is_archive, not_has_excerpt, not_is_search, not_is_404, not_is_paged, not_is_attachment, not_is_singular, not_is_user_logged_in |
+| find      | Required | String or Array. Text to search within the `match` attribute/section. Arrays allow you to match multiple tags on a page with an OR-like search. |
+| where     | Optional | String or Array. Available options: `all` for matching all posts/pages, select WP conditionals, and `path_` or `not_path_` for matching url path. Defaults to `all` if `where` is not specified. Arrays allow you to combine multiple conditions with an AND-like search (only pages containing all conditions will be matched).<br/><br/>Available WP conditionals: is_home, is_front_page, is_single, is_page, is_author, is_archive, has_excerpt, is_search, is_404, is_paged, is_attachment, is_singular, is_user_logged_in, not_is_home, not_is_front_page, not_is_single, not_is_page, not_is_author, not_is_archive, not_has_excerpt, not_is_search, not_is_404, not_is_paged, not_is_attachment, not_is_singular, not_is_user_logged_in |
 | args      | Optional | Array. Available keys: `operation` and `delay`. `delay` must be in milliseconds.<br/>Available operations: `page_loaded` and `user_interaction` |
 
 ### Enable YouTube Facade
@@ -130,12 +130,21 @@ function move_scripts_and_styles_to_footer( $settings ) {
 add_filter( 'wp_utilities_scripts_and_styles_to_move_to_footer', 'move_scripts_and_styles_to_footer', 10, 1 );
 ```
 
-Available tag attributes/sections to search for matching scripts: `id`, `src`, `code`  
-Available tag attributes/sections to search for matching styles (style and link tags): `id`, `href`, `code`  
-Tag attributes/sections can be searched for a specific string or an array of strings that can match multiple tags. Ex: `'match' => 'id', 'find' => 'kadence-header'` or `'match' => 'id', 'find' => array( 'kadence-header', 'wp-block-library' )`
+#### Filter settings options for script tags:
+Add individual configurations by adding a new array to the `scripts` key in the variable passed to your function by the filter.  
+| Key   |     | Allowed Values |
+| ----------- | --- | -------------- |
+| match     | Required | String. `id`, `src`, `code` |
+| find      | Required | String or Array. Text to search within the `match` attribute/section. Arrays allow you to match multiple tags on a page with an OR-like search. |
+| where     | Optional | String or Array. Available options: `all` for matching all posts/pages, select WP conditionals, and `path_` or `not_path_` for matching url path. Defaults to `all` if `where` is not specified. Arrays allow you to combine multiple conditions with an AND-like search (only pages containing all conditions will be matched).<br/><br/>Available WP conditionals: is_home, is_front_page, is_single, is_page, is_author, is_archive, has_excerpt, is_search, is_404, is_paged, is_attachment, is_singular, is_user_logged_in, not_is_home, not_is_front_page, not_is_single, not_is_page, not_is_author, not_is_archive, not_has_excerpt, not_is_search, not_is_404, not_is_paged, not_is_attachment, not_is_singular, not_is_user_logged_in |
 
-Available `where` options: `all` for matching all posts/pages, select WP conditionals, and `path_` or `not_path_` for matching url path. Defaults to `all` if `where` is not specified.   
-Available WP conditionals: is_home, is_front_page, is_single, is_page, is_author, is_archive, has_excerpt, is_search, is_404, is_paged, is_attachment, is_singular, is_user_logged_in, not_is_home, not_is_front_page, not_is_single, not_is_page, not_is_author, not_is_archive, not_has_excerpt, not_is_search, not_is_404, not_is_paged, not_is_attachment, not_is_singular, not_is_user_logged_in  
+#### Filter settings options for style and link tags:
+Add individual configurations by adding a new array to the `styles` key in the variable passed to your function by the filter.  
+| Key   |     | Allowed Values |
+| ----------- | --- | -------------- |
+| match     | Required | String. `id`, `href`, `code` |
+| find      | Required | String or Array. Text to search within the `match` attribute/section. Arrays allow you to match multiple tags on a page with an OR-like search. |
+| where     | Optional | String. Available options: `all` for matching all posts/pages, select WP conditionals, and `path_` or `not_path_` for matching url path. Defaults to `all` if `where` is not specified. Arrays allow you to combine multiple conditions with an AND-like search (only pages containing all conditions will be matched).<br/><br/>Available WP conditionals: is_home, is_front_page, is_single, is_page, is_author, is_archive, has_excerpt, is_search, is_404, is_paged, is_attachment, is_singular, is_user_logged_in, not_is_home, not_is_front_page, not_is_single, not_is_page, not_is_author, not_is_archive, not_has_excerpt, not_is_search, not_is_404, not_is_paged, not_is_attachment, not_is_singular, not_is_user_logged_in |
 
 ### Remove Scripts and Styles
 This utility removes specified javascript scripts and css styles from the frontend. It does not remove them from the admin section.  
@@ -156,7 +165,7 @@ function remove_scripts_and_styles( $settings ) {
     $settings['scripts'][] = array( 
         'match'     => 'src',
         'find'      => 'js/smooth_scroll.min.js',
-        'where'     => 'path_sample-page'
+        'where'     => array( 'path_sample-page', 'is_page' )
     );
     $settings['scripts'][] = array( 
         'match'     => 'code',
@@ -185,9 +194,18 @@ function remove_scripts_and_styles( $settings ) {
 add_filter( 'wp_utilities_scripts_and_styles_to_remove', 'remove_scripts_and_styles', 10, 1 );
 ```
 
-Available tag attributes/sections to search for matching scripts: `id`, `src`, `code`  
-Available tag attributes/sections to search for matching styles (style and link tags): `id`, `href`, `code`  
-Tag attributes/sections can be searched for a specific string or an array of strings that can match multiple tags. Ex: `'match' => 'id', 'find' => 'kadence-header'` or `'match' => 'id', 'find' => array( 'kadence-header', 'wp-block-library' )`
+#### Filter settings options for script tags:
+Add individual configurations by adding a new array to the `scripts` key in the variable passed to your function by the filter.  
+| Key   |     | Allowed Values |
+| ----------- | --- | -------------- |
+| match     | Required | String. `id`, `src`, `code` |
+| find      | Required | String or Array. Text to search within the `match` attribute/section. Arrays allow you to match multiple tags on a page with an OR-like search. |
+| where     | Optional | String or Array. Available options: `all` for matching all posts/pages, select WP conditionals, and `path_` or `not_path_` for matching url path. Defaults to `all` if `where` is not specified. Arrays allow you to combine multiple conditions with an AND-like search (only pages containing all conditions will be matched).<br/><br/>Available WP conditionals: is_home, is_front_page, is_single, is_page, is_author, is_archive, has_excerpt, is_search, is_404, is_paged, is_attachment, is_singular, is_user_logged_in, not_is_home, not_is_front_page, not_is_single, not_is_page, not_is_author, not_is_archive, not_has_excerpt, not_is_search, not_is_404, not_is_paged, not_is_attachment, not_is_singular, not_is_user_logged_in |
 
-Available `where` options: `all` for matching all posts/pages, select WP conditionals, and `path_` or `not_path_` for matching url path. Defaults to `all` if `where` is not specified.  
-Available WP conditionals: is_home, is_front_page, is_single, is_page, is_author, is_archive, has_excerpt, is_search, is_404, is_paged, is_attachment, is_singular, is_user_logged_in, not_is_home, not_is_front_page, not_is_single, not_is_page, not_is_author, not_is_archive, not_has_excerpt, not_is_search, not_is_404, not_is_paged, not_is_attachment, not_is_singular, not_is_user_logged_in  
+#### Filter settings options for style and link tags:
+Add individual configurations by adding a new array to the `styles` key in the variable passed to your function by the filter.  
+| Key   |     | Allowed Values |
+| ----------- | --- | -------------- |
+| match     | Required | String. `id`, `href`, `code` |
+| find      | Required | String or Array. Text to search within the `match` attribute/section. Arrays allow you to match multiple tags on a page with an OR-like search. |
+| where     | Optional | String. Available options: `all` for matching all posts/pages, select WP conditionals, and `path_` or `not_path_` for matching url path. Defaults to `all` if `where` is not specified. Arrays allow you to combine multiple conditions with an AND-like search (only pages containing all conditions will be matched).<br/><br/>Available WP conditionals: is_home, is_front_page, is_single, is_page, is_author, is_archive, has_excerpt, is_search, is_404, is_paged, is_attachment, is_singular, is_user_logged_in, not_is_home, not_is_front_page, not_is_single, not_is_page, not_is_author, not_is_archive, not_has_excerpt, not_is_search, not_is_404, not_is_paged, not_is_attachment, not_is_singular, not_is_user_logged_in |
