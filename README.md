@@ -4,7 +4,7 @@ WP Performance Utilities is a WordPress plugin to improve the performance of a W
 ## Available Utilities
 
 ### Disable jQuery Migrate
-This utility will remove the jQuery Migrate javascript file from the frontend. It does not remove it from the admin section.  
+This utility removes the jQuery Migrate javascript file from the frontend. It does not remove it from the admin section.  
 
 Add this to your wp-config.php file to activate the utility:
 ```php
