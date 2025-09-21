@@ -66,7 +66,7 @@ class Wp_Utilities_Html_Buffer {
 				
 				if ( 'script' === $tag_type ) {
 					$regex_string = '/<script[^>]*?' . $regex_base . '[^>]*?>[\s\S]*?<\/[^>]*script[^>]*>\n?/im';
-				} elseif ( 'link' === $tag_matches ) {
+				} elseif ( isset( $tag_matches ) && 'link' === $tag_matches ) {
 					$regex_string = '/<link[^>]*?' . $regex_base . '[^>]*?rel=[\\\'\"]stylesheet[\\\'\"][^>]*?>\n?|<link[^>]*?rel=[\\\'\"]stylesheet[\\\'\"][^>]*' . $regex_base . '[^>]*?>\n?/im';
 				} else {
 					$regex_string = '/<link[^>]*?' . $regex_base . '[^>]*?rel=[\\\'\"]stylesheet[\\\'\"][^>]*?>\n?|<link[^>]*?rel=[\\\'\"]stylesheet[\\\'\"][^>]*' . $regex_base . '[^>]*?>\n?|<style[^>]*?' . $regex_base . '[^>]*?>[\s\S]*?<\/[^>]*style[^>]*>\n?/im';
@@ -75,7 +75,7 @@ class Wp_Utilities_Html_Buffer {
 
 			$buffer = preg_replace_callback( 
 				$regex_string, 
-				function( $matches ) use( $operation, $tag_type, $tag_matches, $search_string, $ele, &$insert_delay_scripts )  {
+				function( $matches ) use( $operation, $tag_type, $search_string, $ele, &$insert_delay_scripts )  {
 					$tag_contents = $matches[0];
 
 					if ( 'code' === $ele['match'] ) {
@@ -88,7 +88,6 @@ class Wp_Utilities_Html_Buffer {
 					if ( $operation === 'delay' ) {
 						$delay_args = array(
 							'tag_type'		=> $tag_type,
-							'tag_matches'	=> $tag_matches,
 							'tag_contents'	=> $tag_contents,
 							'ele'			=> $ele
 						);

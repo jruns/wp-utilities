@@ -57,12 +57,21 @@ class Wp_Utilities_Delay_Scripts {
 	public static function process_tag( $args, &$insert_delay_scripts ) {
 		extract( $args );
 
-		if ( empty( self::EXCLUSIONS ) || 1 !== preg_match( '/<script[^>]*' . join( '|', self::EXCLUSIONS ) . '[^>]*>/im', $tag_contents ) ) {
+		if ( empty( self::EXCLUSIONS ) || 1 !== preg_match( '/<(script|link)[^>]*' . join( '|', self::EXCLUSIONS ) . '[^>]*>/im', $tag_contents ) ) {
+			// Defer scripts by default
 			if ( 0 === preg_match( '/<script[^>]* defer[^>]*>/im', $tag_contents ) ) {
 				$tag_contents = str_replace( '<script', '<script defer', $tag_contents );
 			}
 
+			// Delay stylesheets
+			if ( array_key_exists( 'tag_type', $args ) && 'style' === $args['tag_type'] ) {
+				$new_tag = preg_replace( '/media=[\\\'\"][^\\\'\"]*[\\\'\"]/im', '', $tag_contents );
+				$new_tag = str_replace( '<link', '<link media="print" onload="this.onload=null;this.removeAttribute(\'media\');"', $new_tag );
+				$tag_contents = $new_tag . '<noscript>' . str_replace( ["\r","\n"], '', $tag_contents ) . '</noscript>' . PHP_EOL;
+			}
+
 			if ( array_key_exists( 'args', $ele ) && ! empty( $ele['args'] ) ) {
+				// Process specified operation
 				if ( array_key_exists( 'operation', $ele['args'] ) ) {
 					$is_external_script = ( 1 === preg_match( '/<script[^>]*?src=[\\\'\"][^\\\'\"]*[\\\'\"][^>]*?>/im', $tag_contents ) );
 
