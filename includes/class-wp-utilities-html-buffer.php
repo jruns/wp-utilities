@@ -91,7 +91,7 @@ class Wp_Utilities_Html_Buffer {
 							'tag_contents'	=> $tag_contents,
 							'ele'			=> $ele
 						);
-						$tag_contents = Wp_Utilities_Delay_Scripts::process_tag( $delay_args, $insert_delay_scripts );
+						$tag_contents = Wp_Utilities_Delay_Scripts_And_Styles::process_tag( $delay_args, $insert_delay_scripts );
 					} else {
 						if ( $operation === 'move_to_footer' ) {
 							$moves_queue[] = $tag_contents;
@@ -114,7 +114,7 @@ class Wp_Utilities_Html_Buffer {
 
 		// Add delay scripts if needed
 		if ( ! empty( $insert_delay_scripts ) ) {
-			$delay_scripts = Wp_Utilities_Delay_Scripts::get_delay_scripts( $insert_delay_scripts );
+			$delay_scripts = Wp_Utilities_Delay_Scripts_And_Styles::get_delay_scripts( $insert_delay_scripts );
 
 			$buffer = str_replace( '</body>', $delay_scripts . '</body>', $buffer );
 		}

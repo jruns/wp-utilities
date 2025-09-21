@@ -22,20 +22,20 @@ Any script tag with one of the following attributes will be excluded from being 
 
 Add this to your wp-config.php file to enable the utility:  
 ```php
-define( 'WP_UTILITIES_DELAY_SCRIPTS', true );
+define( 'WP_UTILITIES_DELAY_SCRIPTS_AND_STYLES', true );
 ```
 Or activate the utility on the WP Performance Utilities wp-admin options page.  
 
 To modify the default user interaction autoload delay of 15000 milliseconds (15s), you can add this to your wp-config.php file:  
 ```php
-define( 'WP_UTILITIES_DELAY_SCRIPTS_AUTOLOAD_DELAY', 15000 );
+define( 'WP_UTILITIES_DELAY_SCRIPTS_AND_STYLES_AUTOLOAD_DELAY', 15000 );
 ```
 Or override the default value in the WP Performance Utilities wp-admin options page.  
 The value entered should be in milliseconds. This is a failsafe that will ensure that a script will still load even if the user takes longer to interact with the page.  
 
-Then specify the scripts or stylesheets to be delayed with the `wp_utilities_scripts_to_delay` filter by adding something like the following to your functions.php file:  
+Then specify the scripts or stylesheets to be delayed with the `wp_utilities_scripts_and_styles_to_delay` filter by adding something like the following to your functions.php file:  
 ```php
-function delay_scripts( $settings ) {
+function delay_scripts_and_styles( $settings ) {
     $settings['scripts'][] = array( 
         'match'     => 'id',
         'find'      => array( 'wc-add-to', 'js-cookie' )
@@ -66,7 +66,7 @@ function delay_scripts( $settings ) {
 
     return $settings;
 }
-add_filter( 'wp_utilities_scripts_to_delay', 'delay_scripts', 10, 1 );
+add_filter( 'wp_utilities_scripts_and_styles_to_delay', 'delay_scripts_and_styles', 10, 1 );
 ```
 
 #### Filter settings options for script tags:

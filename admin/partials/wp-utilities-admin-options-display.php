@@ -104,12 +104,12 @@ $args = array(
 echo output_admin_option( $args );
 
 $args = array(
-    'utility_var'       => 'wp_utilities_delay_scripts',
+    'utility_var'       => 'wp_utilities_delay_scripts_and_styles',
     'heading'           => 'Delay Scripts?',
-    'description'       => 'Enable the `wp_utilities_scripts_to_delay` WordPress filter to selectively delay scripts on the frontend.',
+    'description'       => 'Enable the `wp_utilities_scripts_and_styles_to_delay` WordPress filter to selectively delay javascript and stylesheets on the frontend.',
     'child_options'     => array(
         array(
-            'utility_var'       => 'wp_utilities_delay_scripts_autoload_delay',
+            'utility_var'       => 'wp_utilities_delay_scripts_and_styles_autoload_delay',
             'type'              => 'number',
             'default'           => 15000,
             'heading'           => 'User interaction autoload delay',
