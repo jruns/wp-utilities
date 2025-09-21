@@ -1,6 +1,6 @@
 <?php
 
-class Wp_Utilities_Delay_Scripts {
+class Wp_Utilities_Delay_Scripts_And_Styles {
 
 	private $settings;
 
@@ -13,7 +13,7 @@ class Wp_Utilities_Delay_Scripts {
 			'scripts'	=> array()
 		);
 
-		$this->settings = apply_filters( 'wp_utilities_scripts_to_delay', $this->settings );
+		$this->settings = apply_filters( 'wp_utilities_scripts_and_styles_to_delay', $this->settings );
 	}
 
 	public function process_delays( $buffer ) {
@@ -33,6 +33,19 @@ class Wp_Utilities_Delay_Scripts {
 			$buffer = Wp_Utilities_Html_Buffer::process_buffer_replacements( $buffer, $match_args );
 		}
 
+		if ( ! empty( $this->settings['styles'] ) ) {
+			// Process all stylesheet link tags
+			$match_args = array(
+				'tag_type'			=> 'style',
+				'tag_matches'		=> 'link',
+				'match_settings'	=> $this->settings['styles'],
+				'match_types'		=> array( 'id', 'href' ),
+				'operation'			=> 'delay'
+			);
+
+			$buffer = Wp_Utilities_Html_Buffer::process_buffer_replacements( $buffer, $match_args );
+		}
+
 		return $buffer;
 	}
 
@@ -44,12 +57,21 @@ class Wp_Utilities_Delay_Scripts {
 	public static function process_tag( $args, &$insert_delay_scripts ) {
 		extract( $args );
 
-		if ( empty( self::EXCLUSIONS ) || 1 !== preg_match( '/<script[^>]*' . join( '|', self::EXCLUSIONS ) . '[^>]*>/im', $tag_contents ) ) {
+		if ( empty( self::EXCLUSIONS ) || 1 !== preg_match( '/<(script|link)[^>]*' . join( '|', self::EXCLUSIONS ) . '[^>]*>/im', $tag_contents ) ) {
+			// Defer scripts by default
 			if ( 0 === preg_match( '/<script[^>]* defer[^>]*>/im', $tag_contents ) ) {
 				$tag_contents = str_replace( '<script', '<script defer', $tag_contents );
 			}
 
+			// Delay stylesheets
+			if ( array_key_exists( 'tag_type', $args ) && 'style' === $args['tag_type'] ) {
+				$new_tag = preg_replace( '/media=[\\\'\"][^\\\'\"]*[\\\'\"]/im', '', $tag_contents );
+				$new_tag = str_replace( '<link', '<link media="print" onload="this.onload=null;this.removeAttribute(\'media\');"', $new_tag );
+				$tag_contents = $new_tag . '<noscript>' . str_replace( ["\r","\n"], '', $tag_contents ) . '</noscript>' . PHP_EOL;
+			}
+
 			if ( array_key_exists( 'args', $ele ) && ! empty( $ele['args'] ) ) {
+				// Process specified operation
 				if ( array_key_exists( 'operation', $ele['args'] ) ) {
 					$is_external_script = ( 1 === preg_match( '/<script[^>]*?src=[\\\'\"][^\\\'\"]*[\\\'\"][^>]*?>/im', $tag_contents ) );
 
