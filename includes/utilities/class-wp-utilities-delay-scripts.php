@@ -33,6 +33,19 @@ class Wp_Utilities_Delay_Scripts {
 			$buffer = Wp_Utilities_Html_Buffer::process_buffer_replacements( $buffer, $match_args );
 		}
 
+		if ( ! empty( $this->settings['styles'] ) ) {
+			// Process all stylesheet link tags
+			$match_args = array(
+				'tag_type'			=> 'style',
+				'tag_matches'		=> 'link',
+				'match_settings'	=> $this->settings['styles'],
+				'match_types'		=> array( 'id', 'href' ),
+				'operation'			=> 'delay'
+			);
+
+			$buffer = Wp_Utilities_Html_Buffer::process_buffer_replacements( $buffer, $match_args );
+		}
+
 		return $buffer;
 	}
 
