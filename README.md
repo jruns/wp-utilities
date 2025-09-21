@@ -13,8 +13,8 @@ define( 'WP_UTILITIES_DISABLE_JQUERY_MIGRATE', true );
 
 Or activate the utility on the WP Performance Utilities wp-admin options page.
 
-### Delay Scripts
-This utility allows you to selectively delay inline and external javascript on your site. You can choose from a default delay which will add `defer` to `<script>` tags, a page loaded delay that will delay a script from executing until the page has loaded, or a user interaction delay that will delay a script from executing until the user has interacted with the page. There is a default autoload delay for the user interaction delay that you can modify.  
+### Delay Scripts and Stylesheets
+This utility allows you to selectively delay inline and external javascript on your site, and asynchronously load external stylesheets. For scripts you can choose from a default delay which will add `defer` to `<script>` tags, a page loaded delay that will delay a script from executing until the page has loaded, or a user interaction delay that will delay a script from executing until the user has interacted with the page. There is a default autoload delay for the user interaction delay that you can modify. For external stylesheets there is only one type of delay which modifies the stylesheet to load asynchronously.   
 
 If you have any script configured to use the user_interaction delay you can also take advantage of the `DOMUserInteraction` browser event that we attach to the browser document.  
 
@@ -33,7 +33,7 @@ define( 'WP_UTILITIES_DELAY_SCRIPTS_AUTOLOAD_DELAY', 15000 );
 Or override the default value in the WP Performance Utilities wp-admin options page.  
 The value entered should be in milliseconds. This is a failsafe that will ensure that a script will still load even if the user takes longer to interact with the page.  
 
-Then specify the scripts to be delayed with the `wp_utilities_scripts_to_delay` filter by adding something like the following to your functions.php file:  
+Then specify the scripts or stylesheets to be delayed with the `wp_utilities_scripts_to_delay` filter by adding something like the following to your functions.php file:  
 ```php
 function delay_scripts( $settings ) {
     $settings['scripts'][] = array( 
@@ -59,6 +59,11 @@ function delay_scripts( $settings ) {
         )
     );
 
+    $settings['styles'][] = array( 
+        'match'     => 'id',
+        'find'      => 'dashicons-css'
+    );
+
     return $settings;
 }
 add_filter( 'wp_utilities_scripts_to_delay', 'delay_scripts', 10, 1 );
@@ -72,6 +77,14 @@ Add individual configurations by adding a new array to the `scripts` key in the 
 | find      | Required | String or Array. Text to search within the `match` attribute/section. Arrays allow you to match multiple tags on a page with an OR-like search. |
 | where     | Optional | String or Array. Available options: `all` for matching all posts/pages, select WP conditionals, and `path_` or `not_path_` for matching url path. Defaults to `all` if `where` is not specified. Arrays allow you to combine multiple conditions with an AND-like search (only pages containing all conditions will be matched).<br/><br/>Available WP conditionals: is_home, is_front_page, is_single, is_page, is_author, is_archive, has_excerpt, is_search, is_404, is_paged, is_attachment, is_singular, is_user_logged_in, not_is_home, not_is_front_page, not_is_single, not_is_page, not_is_author, not_is_archive, not_has_excerpt, not_is_search, not_is_404, not_is_paged, not_is_attachment, not_is_singular, not_is_user_logged_in |
 | args      | Optional | Array. Available keys: `operation` and `delay`. `delay` must be in milliseconds.<br/>Available operations: `page_loaded` and `user_interaction` |
+
+#### Filter settings options for stylesheet link tags:
+Add individual configurations by adding a new array to the `styles` key in the variable passed to your function by the filter.  
+| Key   |     | Allowed Values |
+| ----------- | --- | -------------- |
+| match     | Required | String. `id`, `href` |
+| find      | Required | String or Array. Text to search within the `match` attribute/section. Arrays allow you to match multiple tags on a page with an OR-like search. |
+| where     | Optional | String or Array. Available options: `all` for matching all posts/pages, select WP conditionals, and `path_` or `not_path_` for matching url path. Defaults to `all` if `where` is not specified. Arrays allow you to combine multiple conditions with an AND-like search (only pages containing all conditions will be matched).<br/><br/>Available WP conditionals: is_home, is_front_page, is_single, is_page, is_author, is_archive, has_excerpt, is_search, is_404, is_paged, is_attachment, is_singular, is_user_logged_in, not_is_home, not_is_front_page, not_is_single, not_is_page, not_is_author, not_is_archive, not_has_excerpt, not_is_search, not_is_404, not_is_paged, not_is_attachment, not_is_singular, not_is_user_logged_in |
 
 #### How to use the new DOMUserInteraction event:
 You must first have at least one script being delayed on a specified page with the `wp_utilities_scripts_to_delay` filter. Then the new event will be available on that page.  
