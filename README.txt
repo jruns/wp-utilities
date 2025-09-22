@@ -4,7 +4,7 @@ Donate link: https://jruns.github.io//
 Tags: performance, defer, delay
 Requires at least: 6.0
 Tested up to: 6.8.2
-Stable tag: 0.5.0
+Stable tag: 0.5.1
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
