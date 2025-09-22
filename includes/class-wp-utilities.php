@@ -161,6 +161,11 @@ class Wp_Utilities {
 	 * Load enabled utilities
 	 */
 	private function load_utilities() {
+		// Only activate utilites on the frontend
+		if ( is_admin() ) {
+			return;
+		}
+
 		$utilities_dir = dirname( __FILE__ ) . '/utilities/';
 
 		if ( is_dir( $utilities_dir ) ) {
