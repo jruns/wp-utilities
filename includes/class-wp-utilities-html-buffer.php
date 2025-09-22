@@ -25,7 +25,7 @@ class Wp_Utilities_Html_Buffer {
 	}
 
 	public function start_buffer() {
-		ob_start( array( 'self', 'filter_buffer' ) );
+		ob_start( array( Wp_Utilities_Html_Buffer::class, 'filter_buffer' ) );
 	}
 
 	public function end_buffer() {
