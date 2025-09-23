@@ -14,7 +14,7 @@ class Wp_Utilities_Remove_Versions {
 
 		// Process all script and stylesheet source attributes
 		$buffer = preg_replace( 
-			'/(<(?:link|script)[^>]*?(?:href|src)=[\\\'\"][^\\\'\"]+)(\?[^\\\'\"]+)([\\\'\"][^>]*?>)/im',
+			'/(<(?:link|script)[^>]*?(?:href|src)=[\\\'\"][^\\\'\"]+)(\?ver=[^\\\'\"]+)([\\\'\"][^>]*?>)/im',
 			'${1}${3}',
 			$buffer
 		);
