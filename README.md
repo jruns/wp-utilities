@@ -1,5 +1,5 @@
 # wp-utilities
-WP Performance Utilities is a WordPress plugin to improve the performance of a WordPress website. It includes several utilities that can be activated and configured in order to improve various aspects of your website. Disable jQuery Migrate, replace YouTube iframes with a placeholder image (facade), remove scripts or styles from specific pages, move scripts or styles to the page footer, and delay execution of scripts until the page has loaded or the user has interacted with the page.
+WP Performance Utilities is a WordPress plugin to improve the performance of a WordPress website. It includes several utilities that can be activated and configured in order to improve various aspects of your website. Disable jQuery Migrate, remove versions from external scripts and styles, replace YouTube iframes with a placeholder image (facade), remove scripts or styles from specific pages, move scripts or styles to the page footer, and delay execution of scripts until the page has loaded or the user has interacted with the page.
 
 ## Available Utilities
 
@@ -10,7 +10,15 @@ Add this to your wp-config.php file to activate the utility:
 ```php
 define( 'WP_UTILITIES_DISABLE_JQUERY_MIGRATE', true );
 ```
+Or activate the utility on the WP Performance Utilities wp-admin options page.
 
+### Remove Versions
+This utility removes versions and other query string parameters from the source urls of external scripts and styles on the frontend. This can improve browser and CDN caching. 
+
+Add this to your wp-config.php file to activate the utility:
+```php
+define( 'WP_UTILITIES_REMOVE_VERSIONS', true );
+```
 Or activate the utility on the WP Performance Utilities wp-admin options page.
 
 ### Delay Scripts and Stylesheets

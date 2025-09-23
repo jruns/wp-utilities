@@ -169,6 +169,6 @@ class Wp_Utilities_Delay_Scripts_And_Styles {
 	 */
 	public function run() {
 		// Iterate over scripts to delay
-		add_filter( 'wp_utilities_modify_final_output', array( $this, 'process_delays' ), 9 );
+		add_filter( 'wp_utilities_modify_final_output', array( $this, 'process_delays' ), 20 );
 	}
 }

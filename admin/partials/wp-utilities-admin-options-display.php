@@ -90,6 +90,13 @@ $args = array(
 echo output_admin_option( $args );
 
 $args = array(
+    'utility_var'       => 'wp_utilities_remove_versions',
+    'heading'           => 'Remove Versions from Scripts and Styles?',
+    'description'       => 'Remove versions and other query string parameters from the source urls of external scripts and styles on the frontend. This can improve browser and CDN caching.'
+);
+echo output_admin_option( $args );
+
+$args = array(
     'utility_var'       => 'wp_utilities_move_scripts_and_styles_to_footer',
     'heading'           => 'Move Scripts and Styles to the footer?',
     'description'       => 'Enable the `wp_utilities_scripts_and_styles_to_move_to_footer` WordPress filter to selectively move scripts and styles to the page footer on the frontend.'
