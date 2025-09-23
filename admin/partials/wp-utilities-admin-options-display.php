@@ -92,7 +92,7 @@ echo output_admin_option( $args );
 $args = array(
     'utility_var'       => 'wp_utilities_remove_versions',
     'heading'           => 'Remove Versions from Scripts and Styles?',
-    'description'       => 'Remove versions and other query string parameters from the source urls of external scripts and styles on the frontend. This can improve browser and CDN caching.'
+    'description'       => 'Remove versions from the source urls of external scripts and styles on the frontend. This can improve browser and CDN caching.'
 );
 echo output_admin_option( $args );
 

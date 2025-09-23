@@ -13,7 +13,7 @@ define( 'WP_UTILITIES_DISABLE_JQUERY_MIGRATE', true );
 Or activate the utility on the WP Performance Utilities wp-admin options page.
 
 ### Remove Versions
-This utility removes versions and other query string parameters from the source urls of external scripts and styles on the frontend. This can improve browser and CDN caching. 
+This utility removes versions from the source urls of external scripts and styles on the frontend. This can improve browser and CDN caching. 
 
 Add this to your wp-config.php file to activate the utility:
 ```php
