@@ -12,7 +12,7 @@ class Wp_Utilities_Move_Scripts_And_Styles_To_Footer {
 			'styles'	=> array()
 		);
 
-		$this->settings = apply_filters( 'wp_utilities_scripts_and_styles_to_move_to_footer', $this->settings );
+		$this->settings = apply_filters( 'wp_utilities_scripts_and_styles_to_move_to_footer', $this->settings ) ?? $this->settings;
 	}
 
 	public function process_moves( $buffer ) {

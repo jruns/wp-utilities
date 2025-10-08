@@ -12,7 +12,7 @@ class Wp_Utilities_Remove_Scripts_And_Styles {
 			'styles'	=> array()
 		);
 
-		$this->settings = apply_filters( 'wp_utilities_scripts_and_styles_to_remove', $this->settings );
+		$this->settings = apply_filters( 'wp_utilities_scripts_and_styles_to_remove', $this->settings ) ?? $this->settings;
 	}
 
 	public function process_removals( $buffer ) {
