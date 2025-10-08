@@ -106,14 +106,14 @@ echo output_admin_option( $args );
 $args = array(
     'utility_var'       => 'wp_utilities_remove_scripts_and_styles',
     'heading'           => 'Remove Scripts and Styles?',
-    'description'       => 'Enable the `wp_utilities_scripts_and_styles_to_remove` WordPress filter to selectively remove scripts and styles from the frontend.'
+    'description'       => 'Implement the `wp_utilities_scripts_and_styles_to_remove` WordPress filter to selectively remove scripts and styles from the frontend.'
 );
 echo output_admin_option( $args );
 
 $args = array(
     'utility_var'       => 'wp_utilities_delay_scripts_and_styles',
     'heading'           => 'Delay Scripts?',
-    'description'       => 'Enable the `wp_utilities_scripts_and_styles_to_delay` WordPress filter to selectively delay javascript and stylesheets on the frontend.',
+    'description'       => 'Implement the `wp_utilities_scripts_and_styles_to_delay` WordPress filter to selectively delay javascript and stylesheets on the frontend.',
     'child_options'     => array(
         array(
             'utility_var'       => 'wp_utilities_delay_scripts_and_styles_autoload_delay',
