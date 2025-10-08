@@ -49,7 +49,7 @@ class Wp_Utilities_Preload_Images {
 	/**
 	 * Execute commands after initialization
 	 *
-	 * @since    0.1.0
+	 * @since    0.7.0
 	 */
 	public function run() {
 		// Iterate over scripts and styles to remove
