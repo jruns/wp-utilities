@@ -25,16 +25,16 @@ class Wp_Utilities_Preload_Images {
 
 			// Process specific urls to insert
 			foreach( $this->settings['images'] as $image_setting ) {
-				
-				if ( array_key_exists( 'args', $image_setting ) && array_key_exists( 'operation', $image_setting['args'] ) ) {
-					if ( 'insert_url' === $image_setting['args']['operation'] ) {
-						$media_query = '';
+				if ( array_key_exists( 'url', $image_setting ) && ! empty( $image_setting['url'] ) ) {
+					$media_query = '';
+
+					if ( array_key_exists( 'args', $image_setting ) && ! empty( $image_setting['args'] ) ) {
 						if ( array_key_exists( 'media', $image_setting['args'] ) && ! empty( $image_setting['args']['media'] ) ) {
 							$media_query = "media=\"{$image_setting['args']['media']}\" ";
 						}
-
-						$preload_tags = "<link rel=\"preload\" href=\"{$image_setting['args']['url']}\" as=\"image\" fetchpriority=\"high\" {$media_query}/>" . PHP_EOL . $preload_tags;
 					}
+
+					$preload_tags = "<link rel=\"preload\" href=\"{$image_setting['url']}\" as=\"image\" fetchpriority=\"high\" {$media_query}/>" . PHP_EOL . $preload_tags;
 				}
 			}
 		}
