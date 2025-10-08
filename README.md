@@ -1,7 +1,7 @@
 # wp-utilities
 WP Performance Utilities is a WordPress plugin to improve the performance of a WordPress website. It includes several utilities that can be activated and configured in order to improve various aspects of your website.
 
-**Utilities include:**  
+**Utilities included:**  
 - Disable jQuery Migrate
 - Remove versions from external scripts and styles
 - Replace YouTube iframes with a placeholder image (facade)
