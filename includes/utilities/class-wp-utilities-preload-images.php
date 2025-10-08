@@ -15,38 +15,32 @@ class Wp_Utilities_Preload_Images {
 	}
 
 	public function process_images( $buffer ) {
-		// Filter out settomgs that are not valid for the current page, based on conditional matches
+		// Filter out settings that are not valid for the current page, based on conditional matches
 		$this->settings['images'] = Wp_Utilities_Conditional_Checks::filter_matches( $this->settings['images'] );
 
-		// Add to img tag to not lazy load image
-		// data-no-lazy="1"
+		$preload_tags = '';
 
 		// Process images to preload
 		if ( ! empty( $this->settings['images'] ) ) {
 
 			// Process specific urls to insert
 			foreach( $this->settings['images'] as $image_setting ) {
-				$preload_tag = '';
-
+				
 				if ( array_key_exists( 'args', $image_setting ) && array_key_exists( 'operation', $image_setting['args'] ) ) {
 					if ( 'insert_url' === $image_setting['args']['operation'] ) {
-						$preload_tag = "<link rel=\"preload\" href=\"{$image_setting['args']['url']}\" as=\"image\" fetchpriority=\"high\" />";
+						$media_query = '';
+						if ( array_key_exists( 'media', $image_setting['args'] ) && ! empty( $image_setting['args']['media'] ) ) {
+							$media_query = "media=\"{$image_setting['args']['media']}\" ";
+						}
+
+						$preload_tags = "<link rel=\"preload\" href=\"{$image_setting['args']['url']}\" as=\"image\" fetchpriority=\"high\" {$media_query}/>" . PHP_EOL . $preload_tags;
 					}
 				}
-
-				if ( ! empty( $preload_tag ) ) {
-					//$buffer = str_replace( '</head>', $preload_tag . PHP_EOL . '</head>', $buffer );
-				}
 			}
+		}
 
-			// Process other matches
-			/*$match_args = array(
-				'tag_type'			=> 'script',
-				'match_settings'	=> $this->settings['scripts'],
-				'match_types'		=> array( 'id', 'src', 'code' ),
-				'operation'			=> 'remove'
-			);
-			$buffer = Wp_Utilities_Html_Buffer::process_buffer_replacements( $buffer, $match_args );*/
+		if ( ! empty( $preload_tags ) ) {
+			$buffer = str_replace( '</head>', $preload_tags . '</head>', $buffer );
 		}
 
 		return $buffer;
