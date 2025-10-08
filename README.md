@@ -10,7 +10,7 @@ WP Performance Utilities is a WordPress plugin to improve the performance of a W
 - Delay execution of scripts and styles until the page has loaded or the user has interacted with the page.
 - Preload images on specific pages to improve Largest Contentful Paint (LCP).
 
-## Available Utilities Documentation
+## Utilities Documentation
 
 ### Disable jQuery Migrate
 This utility removes the jQuery Migrate javascript file from the frontend. It does not remove it from the admin section.  
