@@ -99,21 +99,21 @@ echo output_admin_option( $args );
 $args = array(
     'utility_var'       => 'wp_utilities_move_scripts_and_styles_to_footer',
     'heading'           => 'Move Scripts and Styles to the footer?',
-    'description'       => 'Enable the `wp_utilities_scripts_and_styles_to_move_to_footer` WordPress filter to selectively move scripts and styles to the page footer on the frontend.'
+    'description'       => 'Activate the `wp_utilities_scripts_and_styles_to_move_to_footer` WordPress filter to selectively move scripts and styles to the page footer on the frontend.'
 );
 echo output_admin_option( $args );
 
 $args = array(
     'utility_var'       => 'wp_utilities_remove_scripts_and_styles',
     'heading'           => 'Remove Scripts and Styles?',
-    'description'       => 'Implement the `wp_utilities_scripts_and_styles_to_remove` WordPress filter to selectively remove scripts and styles from the frontend.'
+    'description'       => 'Activate the `wp_utilities_scripts_and_styles_to_remove` WordPress filter to selectively remove scripts and styles from the frontend.'
 );
 echo output_admin_option( $args );
 
 $args = array(
     'utility_var'       => 'wp_utilities_delay_scripts_and_styles',
     'heading'           => 'Delay Scripts?',
-    'description'       => 'Implement the `wp_utilities_scripts_and_styles_to_delay` WordPress filter to selectively delay javascript and stylesheets on the frontend.',
+    'description'       => 'Activate the `wp_utilities_scripts_and_styles_to_delay` WordPress filter to selectively delay javascript and stylesheets on the frontend.',
     'child_options'     => array(
         array(
             'utility_var'       => 'wp_utilities_delay_scripts_and_styles_autoload_delay',
@@ -129,7 +129,7 @@ echo output_admin_option( $args );
 $args = array(
     'utility_var'       => 'wp_utilities_preload_images',
     'heading'           => 'Preload Images?',
-    'description'       => 'Implement the `wp_utilities_images_to_preload` WordPress filter to selectively preload images on the frontend to improve Largest Contentful Paint (LCP).'
+    'description'       => 'Activate the `wp_utilities_images_to_preload` WordPress filter to selectively preload images on the frontend to improve Largest Contentful Paint (LCP).'
 );
 echo output_admin_option( $args );
 
