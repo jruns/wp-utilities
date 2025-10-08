@@ -97,6 +97,13 @@ $args = array(
 echo output_admin_option( $args );
 
 $args = array(
+    'utility_var'       => 'wp_utilities_enable_youtube_facade',
+    'heading'           => 'Enable YouTube Facade?',
+    'description'       => 'Enable YouTube facade for videos on the frontend, and delay loading videos until the user clicks the placeholder image.'
+);
+echo output_admin_option( $args );
+
+$args = array(
     'utility_var'       => 'wp_utilities_move_scripts_and_styles_to_footer',
     'heading'           => 'Move Scripts and Styles to the footer?',
     'description'       => 'Activate the `wp_utilities_scripts_and_styles_to_move_to_footer` WordPress filter to selectively move scripts and styles to the page footer on the frontend.'
@@ -130,13 +137,6 @@ $args = array(
     'utility_var'       => 'wp_utilities_preload_images',
     'heading'           => 'Preload Images?',
     'description'       => 'Activate the `wp_utilities_images_to_preload` WordPress filter to selectively preload images on the frontend to improve Largest Contentful Paint (LCP).'
-);
-echo output_admin_option( $args );
-
-$args = array(
-    'utility_var'       => 'wp_utilities_enable_youtube_facade',
-    'heading'           => 'Enable YouTube Facade?',
-    'description'       => 'Enable YouTube facade for videos on the frontend, and delay loading videos until the user clicks the placeholder image.'
 );
 echo output_admin_option( $args );
 ?>
